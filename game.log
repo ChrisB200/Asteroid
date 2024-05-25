@@ -4282,3 +4282,323 @@
 2024-05-25 15:50:15,585 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo\idle
 2024-05-25 15:50:15,590 - __main__ - INFO - Detected controller, name: DualSense Wireless Controller, guid: 030057564c050000e60c000000016800
 2024-05-25 15:50:15,590 - __main__ - INFO - Detected 2 input devices
+2024-05-25 15:58:51,575 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow
+2024-05-25 15:58:51,576 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid
+2024-05-25 15:58:51,576 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion
+2024-05-25 15:58:51,576 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam
+2024-05-25 15:58:51,577 - scripts.animation - INFO - Loading animations from directory: data/assets/missile
+2024-05-25 15:58:51,577 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship
+2024-05-25 15:58:51,577 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo
+2024-05-25 15:58:51,578 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\enter
+2024-05-25 15:58:51,579 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\exit
+2024-05-25 15:58:51,579 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\idle
+2024-05-25 15:58:51,581 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\hit
+2024-05-25 15:58:51,581 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\idle
+2024-05-25 15:58:51,582 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion\explode
+2024-05-25 15:58:51,583 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\hit
+2024-05-25 15:58:51,584 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\idle
+2024-05-25 15:58:51,585 - scripts.animation - INFO - Loading animations from directory: data/assets/missile\idle
+2024-05-25 15:58:51,586 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship\idle
+2024-05-25 15:58:51,586 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo\idle
+2024-05-25 15:58:51,591 - __main__ - INFO - Detected controller, name: DualSense Wireless Controller, guid: 030057564c050000e60c000000016800
+2024-05-25 15:58:51,591 - __main__ - INFO - Detected 2 input devices
+2024-05-25 15:59:07,604 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow
+2024-05-25 15:59:07,605 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid
+2024-05-25 15:59:07,605 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion
+2024-05-25 15:59:07,605 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam
+2024-05-25 15:59:07,606 - scripts.animation - INFO - Loading animations from directory: data/assets/missile
+2024-05-25 15:59:07,606 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship
+2024-05-25 15:59:07,606 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo
+2024-05-25 15:59:07,606 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\enter
+2024-05-25 15:59:07,607 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\exit
+2024-05-25 15:59:07,608 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\idle
+2024-05-25 15:59:07,609 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\hit
+2024-05-25 15:59:07,609 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\idle
+2024-05-25 15:59:07,610 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion\explode
+2024-05-25 15:59:07,612 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\hit
+2024-05-25 15:59:07,613 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\idle
+2024-05-25 15:59:07,614 - scripts.animation - INFO - Loading animations from directory: data/assets/missile\idle
+2024-05-25 15:59:07,615 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship\idle
+2024-05-25 15:59:07,615 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo\idle
+2024-05-25 15:59:07,619 - __main__ - INFO - Detected controller, name: DualSense Wireless Controller, guid: 030057564c050000e60c000000016800
+2024-05-25 15:59:07,621 - __main__ - INFO - Detected 2 input devices
+2024-05-25 16:00:02,304 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow
+2024-05-25 16:00:02,305 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid
+2024-05-25 16:00:02,305 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion
+2024-05-25 16:00:02,305 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam
+2024-05-25 16:00:02,306 - scripts.animation - INFO - Loading animations from directory: data/assets/missile
+2024-05-25 16:00:02,306 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship
+2024-05-25 16:00:02,306 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo
+2024-05-25 16:00:02,307 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\enter
+2024-05-25 16:00:02,307 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\exit
+2024-05-25 16:00:02,308 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\idle
+2024-05-25 16:00:02,309 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\hit
+2024-05-25 16:00:02,310 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\idle
+2024-05-25 16:00:02,311 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion\explode
+2024-05-25 16:00:02,312 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\hit
+2024-05-25 16:00:02,313 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\idle
+2024-05-25 16:00:02,314 - scripts.animation - INFO - Loading animations from directory: data/assets/missile\idle
+2024-05-25 16:00:02,314 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship\idle
+2024-05-25 16:00:02,315 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo\idle
+2024-05-25 16:00:02,319 - __main__ - INFO - Detected controller, name: DualSense Wireless Controller, guid: 030057564c050000e60c000000016800
+2024-05-25 16:00:02,320 - __main__ - INFO - Detected 2 input devices
+2024-05-25 16:00:55,152 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow
+2024-05-25 16:00:55,152 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid
+2024-05-25 16:00:55,153 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion
+2024-05-25 16:00:55,153 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam
+2024-05-25 16:00:55,153 - scripts.animation - INFO - Loading animations from directory: data/assets/missile
+2024-05-25 16:00:55,154 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship
+2024-05-25 16:00:55,154 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo
+2024-05-25 16:00:55,154 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\enter
+2024-05-25 16:00:55,155 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\exit
+2024-05-25 16:00:55,156 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\idle
+2024-05-25 16:00:55,157 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\hit
+2024-05-25 16:00:55,158 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\idle
+2024-05-25 16:00:55,158 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion\explode
+2024-05-25 16:00:55,160 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\hit
+2024-05-25 16:00:55,161 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\idle
+2024-05-25 16:00:55,161 - scripts.animation - INFO - Loading animations from directory: data/assets/missile\idle
+2024-05-25 16:00:55,162 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship\idle
+2024-05-25 16:00:55,162 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo\idle
+2024-05-25 16:00:55,167 - __main__ - INFO - Detected controller, name: DualSense Wireless Controller, guid: 030057564c050000e60c000000016800
+2024-05-25 16:00:55,167 - __main__ - INFO - Detected 2 input devices
+2024-05-25 16:03:00,521 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow
+2024-05-25 16:03:00,522 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid
+2024-05-25 16:03:00,522 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion
+2024-05-25 16:03:00,522 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam
+2024-05-25 16:03:00,522 - scripts.animation - INFO - Loading animations from directory: data/assets/missile
+2024-05-25 16:03:00,523 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship
+2024-05-25 16:03:00,523 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo
+2024-05-25 16:03:00,523 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\enter
+2024-05-25 16:03:00,524 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\exit
+2024-05-25 16:03:00,524 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\idle
+2024-05-25 16:03:00,525 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\hit
+2024-05-25 16:03:00,526 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\idle
+2024-05-25 16:03:00,526 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion\explode
+2024-05-25 16:03:00,528 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\hit
+2024-05-25 16:03:00,528 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\idle
+2024-05-25 16:03:00,529 - scripts.animation - INFO - Loading animations from directory: data/assets/missile\idle
+2024-05-25 16:03:00,530 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship\idle
+2024-05-25 16:03:00,530 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo\idle
+2024-05-25 16:03:00,536 - __main__ - INFO - Detected controller, name: DualSense Wireless Controller, guid: 030057564c050000e60c000000016800
+2024-05-25 16:03:00,536 - __main__ - INFO - Detected 2 input devices
+2024-05-25 16:04:02,215 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow
+2024-05-25 16:04:02,216 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid
+2024-05-25 16:04:02,217 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion
+2024-05-25 16:04:02,217 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam
+2024-05-25 16:04:02,217 - scripts.animation - INFO - Loading animations from directory: data/assets/missile
+2024-05-25 16:04:02,218 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship
+2024-05-25 16:04:02,218 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo
+2024-05-25 16:04:02,218 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\enter
+2024-05-25 16:04:02,219 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\exit
+2024-05-25 16:04:02,219 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\idle
+2024-05-25 16:04:02,220 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\hit
+2024-05-25 16:04:02,221 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\idle
+2024-05-25 16:04:02,221 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion\explode
+2024-05-25 16:04:02,222 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\hit
+2024-05-25 16:04:02,223 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\idle
+2024-05-25 16:04:02,224 - scripts.animation - INFO - Loading animations from directory: data/assets/missile\idle
+2024-05-25 16:04:02,225 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship\idle
+2024-05-25 16:04:02,225 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo\idle
+2024-05-25 16:04:02,230 - __main__ - INFO - Detected controller, name: DualSense Wireless Controller, guid: 030057564c050000e60c000000016800
+2024-05-25 16:04:02,231 - __main__ - INFO - Detected 2 input devices
+2024-05-25 16:06:18,603 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow
+2024-05-25 16:06:18,604 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid
+2024-05-25 16:06:18,604 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion
+2024-05-25 16:06:18,604 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam
+2024-05-25 16:06:18,605 - scripts.animation - INFO - Loading animations from directory: data/assets/missile
+2024-05-25 16:06:18,605 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship
+2024-05-25 16:06:18,605 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo
+2024-05-25 16:06:18,606 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\enter
+2024-05-25 16:06:18,606 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\exit
+2024-05-25 16:06:18,607 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\idle
+2024-05-25 16:06:18,609 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\hit
+2024-05-25 16:06:18,609 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\idle
+2024-05-25 16:06:18,610 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion\explode
+2024-05-25 16:06:18,612 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\hit
+2024-05-25 16:06:18,613 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\idle
+2024-05-25 16:06:18,613 - scripts.animation - INFO - Loading animations from directory: data/assets/missile\idle
+2024-05-25 16:06:18,614 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship\idle
+2024-05-25 16:06:18,615 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo\idle
+2024-05-25 16:06:18,619 - __main__ - INFO - Detected controller, name: DualSense Wireless Controller, guid: 030057564c050000e60c000000016800
+2024-05-25 16:06:18,619 - __main__ - INFO - Detected 2 input devices
+2024-05-25 16:06:27,580 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow
+2024-05-25 16:06:27,581 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid
+2024-05-25 16:06:27,581 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion
+2024-05-25 16:06:27,581 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam
+2024-05-25 16:06:27,582 - scripts.animation - INFO - Loading animations from directory: data/assets/missile
+2024-05-25 16:06:27,582 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship
+2024-05-25 16:06:27,582 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo
+2024-05-25 16:06:27,583 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\enter
+2024-05-25 16:06:27,583 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\exit
+2024-05-25 16:06:27,584 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\idle
+2024-05-25 16:06:27,585 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\hit
+2024-05-25 16:06:27,586 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\idle
+2024-05-25 16:06:27,586 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion\explode
+2024-05-25 16:06:27,588 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\hit
+2024-05-25 16:06:27,590 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\idle
+2024-05-25 16:06:27,590 - scripts.animation - INFO - Loading animations from directory: data/assets/missile\idle
+2024-05-25 16:06:27,591 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship\idle
+2024-05-25 16:06:27,592 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo\idle
+2024-05-25 16:06:27,597 - __main__ - INFO - Detected controller, name: DualSense Wireless Controller, guid: 030057564c050000e60c000000016800
+2024-05-25 16:06:27,597 - __main__ - INFO - Detected 2 input devices
+2024-05-25 16:07:38,918 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow
+2024-05-25 16:07:38,918 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid
+2024-05-25 16:07:38,919 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion
+2024-05-25 16:07:38,919 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam
+2024-05-25 16:07:38,919 - scripts.animation - INFO - Loading animations from directory: data/assets/missile
+2024-05-25 16:07:38,919 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship
+2024-05-25 16:07:38,920 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo
+2024-05-25 16:07:38,920 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\enter
+2024-05-25 16:07:38,921 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\exit
+2024-05-25 16:07:38,921 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\idle
+2024-05-25 16:07:38,922 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\hit
+2024-05-25 16:07:38,923 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\idle
+2024-05-25 16:07:38,923 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion\explode
+2024-05-25 16:07:38,925 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\hit
+2024-05-25 16:07:38,926 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\idle
+2024-05-25 16:07:38,926 - scripts.animation - INFO - Loading animations from directory: data/assets/missile\idle
+2024-05-25 16:07:38,927 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship\idle
+2024-05-25 16:07:38,928 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo\idle
+2024-05-25 16:07:38,933 - __main__ - INFO - Detected controller, name: DualSense Wireless Controller, guid: 030057564c050000e60c000000016800
+2024-05-25 16:07:38,933 - __main__ - INFO - Detected 2 input devices
+2024-05-25 16:08:19,827 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow
+2024-05-25 16:08:19,828 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid
+2024-05-25 16:08:19,828 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion
+2024-05-25 16:08:19,829 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam
+2024-05-25 16:08:19,829 - scripts.animation - INFO - Loading animations from directory: data/assets/missile
+2024-05-25 16:08:19,829 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship
+2024-05-25 16:08:19,829 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo
+2024-05-25 16:08:19,830 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\enter
+2024-05-25 16:08:19,830 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\exit
+2024-05-25 16:08:19,831 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\idle
+2024-05-25 16:08:19,833 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\hit
+2024-05-25 16:08:19,833 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\idle
+2024-05-25 16:08:19,834 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion\explode
+2024-05-25 16:08:19,836 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\hit
+2024-05-25 16:08:19,837 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\idle
+2024-05-25 16:08:19,837 - scripts.animation - INFO - Loading animations from directory: data/assets/missile\idle
+2024-05-25 16:08:19,839 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship\idle
+2024-05-25 16:08:19,840 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo\idle
+2024-05-25 16:08:19,845 - __main__ - INFO - Detected controller, name: DualSense Wireless Controller, guid: 030057564c050000e60c000000016800
+2024-05-25 16:08:19,845 - __main__ - INFO - Detected 2 input devices
+2024-05-25 16:08:46,164 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow
+2024-05-25 16:08:46,165 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid
+2024-05-25 16:08:46,166 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion
+2024-05-25 16:08:46,166 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam
+2024-05-25 16:08:46,167 - scripts.animation - INFO - Loading animations from directory: data/assets/missile
+2024-05-25 16:08:46,167 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship
+2024-05-25 16:08:46,167 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo
+2024-05-25 16:08:46,168 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\enter
+2024-05-25 16:08:46,169 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\exit
+2024-05-25 16:08:46,170 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\idle
+2024-05-25 16:08:46,171 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\hit
+2024-05-25 16:08:46,172 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\idle
+2024-05-25 16:08:46,172 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion\explode
+2024-05-25 16:08:46,173 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\hit
+2024-05-25 16:08:46,175 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\idle
+2024-05-25 16:08:46,175 - scripts.animation - INFO - Loading animations from directory: data/assets/missile\idle
+2024-05-25 16:08:46,176 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship\idle
+2024-05-25 16:08:46,176 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo\idle
+2024-05-25 16:08:46,181 - __main__ - INFO - Detected controller, name: DualSense Wireless Controller, guid: 030057564c050000e60c000000016800
+2024-05-25 16:08:46,182 - __main__ - INFO - Detected 2 input devices
+2024-05-25 16:09:31,963 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow
+2024-05-25 16:09:31,964 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid
+2024-05-25 16:09:31,964 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion
+2024-05-25 16:09:31,964 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam
+2024-05-25 16:09:31,965 - scripts.animation - INFO - Loading animations from directory: data/assets/missile
+2024-05-25 16:09:31,965 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship
+2024-05-25 16:09:31,966 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo
+2024-05-25 16:09:31,966 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\enter
+2024-05-25 16:09:31,967 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\exit
+2024-05-25 16:09:31,967 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\idle
+2024-05-25 16:09:31,968 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\hit
+2024-05-25 16:09:31,968 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\idle
+2024-05-25 16:09:31,969 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion\explode
+2024-05-25 16:09:31,970 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\hit
+2024-05-25 16:09:31,971 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\idle
+2024-05-25 16:09:31,972 - scripts.animation - INFO - Loading animations from directory: data/assets/missile\idle
+2024-05-25 16:09:31,973 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship\idle
+2024-05-25 16:09:31,973 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo\idle
+2024-05-25 16:09:31,978 - __main__ - INFO - Detected controller, name: DualSense Wireless Controller, guid: 030057564c050000e60c000000016800
+2024-05-25 16:09:31,978 - __main__ - INFO - Detected 2 input devices
+2024-05-25 16:09:47,353 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow
+2024-05-25 16:09:47,353 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid
+2024-05-25 16:09:47,354 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion
+2024-05-25 16:09:47,354 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam
+2024-05-25 16:09:47,354 - scripts.animation - INFO - Loading animations from directory: data/assets/missile
+2024-05-25 16:09:47,354 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship
+2024-05-25 16:09:47,355 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo
+2024-05-25 16:09:47,355 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\enter
+2024-05-25 16:09:47,356 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\exit
+2024-05-25 16:09:47,356 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\idle
+2024-05-25 16:09:47,357 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\hit
+2024-05-25 16:09:47,357 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\idle
+2024-05-25 16:09:47,358 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion\explode
+2024-05-25 16:09:47,359 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\hit
+2024-05-25 16:09:47,361 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\idle
+2024-05-25 16:09:47,362 - scripts.animation - INFO - Loading animations from directory: data/assets/missile\idle
+2024-05-25 16:09:47,362 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship\idle
+2024-05-25 16:09:47,363 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo\idle
+2024-05-25 16:09:47,368 - __main__ - INFO - Detected controller, name: DualSense Wireless Controller, guid: 030057564c050000e60c000000016800
+2024-05-25 16:09:47,369 - __main__ - INFO - Detected 2 input devices
+2024-05-25 16:10:00,879 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow
+2024-05-25 16:10:00,880 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid
+2024-05-25 16:10:00,880 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion
+2024-05-25 16:10:00,881 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam
+2024-05-25 16:10:00,881 - scripts.animation - INFO - Loading animations from directory: data/assets/missile
+2024-05-25 16:10:00,881 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship
+2024-05-25 16:10:00,882 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo
+2024-05-25 16:10:00,882 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\enter
+2024-05-25 16:10:00,883 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\exit
+2024-05-25 16:10:00,883 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\idle
+2024-05-25 16:10:00,884 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\hit
+2024-05-25 16:10:00,885 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\idle
+2024-05-25 16:10:00,885 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion\explode
+2024-05-25 16:10:00,886 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\hit
+2024-05-25 16:10:00,887 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\idle
+2024-05-25 16:10:00,888 - scripts.animation - INFO - Loading animations from directory: data/assets/missile\idle
+2024-05-25 16:10:00,888 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship\idle
+2024-05-25 16:10:00,889 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo\idle
+2024-05-25 16:10:00,894 - __main__ - INFO - Detected controller, name: DualSense Wireless Controller, guid: 030057564c050000e60c000000016800
+2024-05-25 16:10:00,894 - __main__ - INFO - Detected 2 input devices
+2024-05-25 16:10:10,005 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow
+2024-05-25 16:10:10,006 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid
+2024-05-25 16:10:10,006 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion
+2024-05-25 16:10:10,007 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam
+2024-05-25 16:10:10,007 - scripts.animation - INFO - Loading animations from directory: data/assets/missile
+2024-05-25 16:10:10,007 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship
+2024-05-25 16:10:10,008 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo
+2024-05-25 16:10:10,008 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\enter
+2024-05-25 16:10:10,009 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\exit
+2024-05-25 16:10:10,010 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\idle
+2024-05-25 16:10:10,011 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\hit
+2024-05-25 16:10:10,012 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\idle
+2024-05-25 16:10:10,013 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion\explode
+2024-05-25 16:10:10,014 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\hit
+2024-05-25 16:10:10,015 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\idle
+2024-05-25 16:10:10,016 - scripts.animation - INFO - Loading animations from directory: data/assets/missile\idle
+2024-05-25 16:10:10,016 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship\idle
+2024-05-25 16:10:10,016 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo\idle
+2024-05-25 16:10:10,021 - __main__ - INFO - Detected controller, name: DualSense Wireless Controller, guid: 030057564c050000e60c000000016800
+2024-05-25 16:10:10,021 - __main__ - INFO - Detected 2 input devices
+2024-05-25 16:10:34,329 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow
+2024-05-25 16:10:34,329 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid
+2024-05-25 16:10:34,330 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion
+2024-05-25 16:10:34,330 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam
+2024-05-25 16:10:34,330 - scripts.animation - INFO - Loading animations from directory: data/assets/missile
+2024-05-25 16:10:34,331 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship
+2024-05-25 16:10:34,331 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo
+2024-05-25 16:10:34,331 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\enter
+2024-05-25 16:10:34,332 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\exit
+2024-05-25 16:10:34,333 - scripts.animation - INFO - Loading animations from directory: data/assets/arrow\idle
+2024-05-25 16:10:34,334 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\hit
+2024-05-25 16:10:34,334 - scripts.animation - INFO - Loading animations from directory: data/assets/asteroid\idle
+2024-05-25 16:10:34,335 - scripts.animation - INFO - Loading animations from directory: data/assets/explosion\explode
+2024-05-25 16:10:34,336 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\hit
+2024-05-25 16:10:34,337 - scripts.animation - INFO - Loading animations from directory: data/assets/lasarbeam\idle
+2024-05-25 16:10:34,338 - scripts.animation - INFO - Loading animations from directory: data/assets/missile\idle
+2024-05-25 16:10:34,338 - scripts.animation - INFO - Loading animations from directory: data/assets/spaceship\idle
+2024-05-25 16:10:34,339 - scripts.animation - INFO - Loading animations from directory: data/assets/ufo\idle
+2024-05-25 16:10:34,343 - __main__ - INFO - Detected controller, name: DualSense Wireless Controller, guid: 030057564c050000e60c000000016800
+2024-05-25 16:10:34,344 - __main__ - INFO - Detected 2 input devices

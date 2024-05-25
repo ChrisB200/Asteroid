@@ -45,6 +45,7 @@ class Game():
         self.ufos = ModifiedSpriteGroup()
         self.asteroids = ModifiedSpriteGroup()
         self.arrows = ModifiedSpriteGroup()
+        self.explosions = ModifiedSpriteGroup()
         self.state = "running"
 
         self.bg = pygame.image.load("data/bg.png")
@@ -116,7 +117,6 @@ class Game():
                     self.ufos.add(ufo)
                     self.arrows.add(ufo.arrow)
                     self.add_to_world(ufo, ufo.arrow)
-                    print(ufo.transform)
 
             for player in self.players:
                 player.event_handler(event, self)

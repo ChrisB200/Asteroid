@@ -193,6 +193,7 @@ class Player(PhysicsEntity):
         center = self.get_center()
         center.y += 10
         self.particles = ParticleSystem(self.transform, (16.5, 26))
+        self.explosion = None
         self.set_action("idle")
 
     def event_handler(self, event, game):
@@ -308,12 +309,26 @@ class Player(PhysicsEntity):
         if self.canBeDamaged:
             self.canBeDamaged = False
             self.health -= damage
+            self.explosion = Entity(self.transform, (32, 32), "explosion", self.assets, self.camLayer+1, animation="explode")
 
     def handle_collision(self, sprite):
         if sprite.tag == "ufo":
             if not self.entityCollisions.has(sprite):
                 self.take_damage(sprite.damage)
         super().handle_collision(sprite)
+
+    def handle_explosion(self, game):
+        if not game.explosions.has(self.explosion):
+            if self.explosion:
+                game.explosions.add(self.explosion)
+                game.add_to_world(self.explosion)
+    
+        if self.explosion:
+            self.explosion.update(game.dt)
+
+            if self.explosion.animation.done:
+                self.explosion.kill()
+                self.explosion = None
 
     def update(self, tiles, dt, camera: Camera, game):
         self.movement.x = (-1 if self.directions["left"] else 1 if self.directions["right"] else 0) * self.speed
@@ -330,11 +345,13 @@ class Player(PhysicsEntity):
         self.update_animation(dt)
         self.update_particles(dt, camera, self.transform)
         self.check_collisions(game.ufos, game.asteroids)
+        self.handle_explosion(game)
 
         if self.input:
             self.input.update()
         if self.weapon:
             self.weapon.update(self, camera, dt, game)
+        
         #camera.draw_rect((255, 0, 0), self.rect)
 
 class UserCursor(Entity):

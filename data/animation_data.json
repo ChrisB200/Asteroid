@@ -12,5 +12,9 @@
   "arrow/exit": {
     "img_dur": 0.1,
     "loop": false
+  },
+  "explosion/explode": {
+    "img_dur": 0.03,
+    "loop": false
   }
 }
