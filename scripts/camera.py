@@ -102,6 +102,8 @@ class Camera(pygame.sprite.Group):
     def draw_background(self, **kwargs):
         if "fill" in kwargs:
             self.screen.fill(kwargs["fill"])
+        if "image" in kwargs:
+            self.screen.blit(kwargs["image"], (0, 0))
         else:
             self.screen.fill((0, 0, 0, 0))  # fill with transparency by default
 

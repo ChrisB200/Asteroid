@@ -44,6 +44,8 @@ class Game():
         self.bullets = ModifiedSpriteGroup()
         self.state = "running"
 
+        self.bg = pygame.image.load("data/bg.png")
+
     def add_to_world(self, *sprites):
         self.window.world.add(*sprites)
 
@@ -78,7 +80,7 @@ class Game():
 
     # draws the window
     def draw(self):
-        self.window.draw_world(fill=(150, 150, 150))
+        self.window.draw_world(image=self.bg)
         self.window.draw_foreground()
         self.window.draw()
         pygame.display.flip()
