@@ -2,6 +2,7 @@ import pygame
 from pygame.constants import *
 
 from scripts.entities import PhysicsEntity
+from scripts.particles import Particle, ParticleSystem
 
 class Weapon():
     def __init__(self, maxMagazine, reloadTime, isAutomatic, shootTime, bullet, muzzleAreas):
@@ -85,6 +86,8 @@ class Projectile(PhysicsEntity):
         self.hit = False
         self.set_rotation(-90)
         self.canDoDamage = True
+        self.asteroid = None
+        self.particles = ParticleSystem(self.transform)
 
     def copy(self):
         return self.__class__(self.transform, self.size, self.tag, self.assets, self.camLayer, self.isScroll, self.anim)
@@ -96,19 +99,22 @@ class Projectile(PhysicsEntity):
         if self.hit:
             if self.animation.done:
                 self.kill()
+        if self.asteroid:
+            self.asteroid.asteroid_particles(self.transform, self.particles)
 
-    def hit_entity(self):
+    def hit_entity(self, sprite):
         if self.canDoDamage:
             self.movement.y = 0
             self.set_action("hit")
             self.hit = True
-            self.canDoDamage = False
+            self.canDoDamage = False   
 
     def handle_collision(self, sprite):
         if sprite.tag == "asteroid":
-            self.hit_entity()
+            self.hit_entity(sprite)
+            self.asteroid = sprite
         if sprite.tag == "ufo":
-            self.hit_entity()
+            self.hit_entity(sprite)
 
         super().handle_collision(sprite)
 
@@ -117,3 +123,5 @@ class Projectile(PhysicsEntity):
         self.move(self.movement * self.speed, [], dt)
         self.check_collisions(game.asteroids, game.ufos)
         self.check_finished()
+        self.particles.update(dt, self.transform)
+        self.particles.draw(game.window.world)

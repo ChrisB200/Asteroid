@@ -334,11 +334,11 @@ class Player(PhysicsEntity):
         
         self.particles.add(yellow, red, orange)
 
-    def asteroid_particles(self):
+    def asteroid_particles(self, center):
         speedMultiplier = 1.4
 
         brown = Particle(
-            transform=self.get_center(), 
+            transform=center, 
             velocity=(random.randint(-200, 200) / speedMultiplier, random.randint(-200, 200) / speedMultiplier),
             timer = 2,
             radius=2, 
@@ -348,7 +348,7 @@ class Player(PhysicsEntity):
         )
 
         darkbrown = Particle(
-            transform=self.get_center(), 
+            transform=center, 
             velocity=(random.randint(-200, 200) / speedMultiplier, random.randint(-200, 200) / speedMultiplier),
             timer = 2,
             radius=2, 
@@ -358,7 +358,7 @@ class Player(PhysicsEntity):
         )
 
         black = Particle(
-            transform=self.get_center(), 
+            transform=center, 
             velocity=(random.randint(-200, 200) / speedMultiplier, random.randint(-200, 200) / speedMultiplier),
             timer = 2,
             radius=2, 
@@ -438,7 +438,7 @@ class Player(PhysicsEntity):
         if self.explosion:
             self.explosion.update(game.dt)
             self.explosion_particles()
-            self.asteroid_particles()
+            self.asteroid_particles(self.get_center())
           
             if self.explosion.animation.done:
                 self.explosion.kill()
@@ -606,7 +606,7 @@ class UFO(PhysicsEntity):
         self.move(self.movement, [], dt)
         self.check_bounds(camera.screenSize)
         self.check_collisions(game.players, game.asteroids)
-        camera.draw_rect((255, 0, 0), self.rect)
+        #camera.draw_rect((255, 0, 0), self.rect)
 
 class Asteroid(PhysicsEntity):
     def __init__(self, transform, size, tag, assets, layer=1, isScroll=True, animation="idle"):
@@ -620,7 +620,7 @@ class Asteroid(PhysicsEntity):
 
     @property
     def image(self):
-        rotated_image = pygame.transform.rotate(pygame.transform.scale2x(self.animation.img()), self.localRotation)
+        rotated_image = pygame.transform.rotate(self.animation.img(), self.localRotation)
         self.rect = rotated_image.get_rect(center=self.get_center())
         return rotated_image
 
@@ -643,6 +643,41 @@ class Asteroid(PhysicsEntity):
         if sprite.tag == "spaceship":
             self.kill()
         super().handle_collision(sprite)
+
+    def asteroid_particles(self, center, particles):
+        speedMultiplier = 1.4
+
+        brown = Particle(
+            transform=center, 
+            velocity=(random.randint(-200, 200) / speedMultiplier, random.randint(-200, 200) / speedMultiplier),
+            timer = 2,
+            radius=2, 
+            shrinkvel=4,
+            colour=(50, 50, 50),
+            layer=self.camLayer+2,
+        )
+
+        darkbrown = Particle(
+            transform=center, 
+            velocity=(random.randint(-200, 200) / speedMultiplier, random.randint(-200, 200) / speedMultiplier),
+            timer = 2,
+            radius=2, 
+            shrinkvel=4, 
+            colour= (100, 100, 100),
+            layer=self.camLayer+2,
+        )
+
+        black = Particle(
+            transform=center, 
+            velocity=(random.randint(-200, 200) / speedMultiplier, random.randint(-200, 200) / speedMultiplier),
+            timer = 2,
+            radius=2, 
+            shrinkvel=4, 
+            colour= (150, 150, 150),
+            layer=self.camLayer+2,
+        )
+        
+        particles.add(brown, darkbrown, black)
         
     def update(self, dt, game):    
         self.move(self.direction, [], dt)

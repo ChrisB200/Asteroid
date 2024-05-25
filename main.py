@@ -127,7 +127,7 @@ class Game():
     def event_handler(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.state = ""
+                self.state = "" 
             if event.type == pygame.KEYDOWN:
                 if event.key == K_SPACE:
                     ufo = UFO((0, 0), (24, 19), "ufo", self.assets)
