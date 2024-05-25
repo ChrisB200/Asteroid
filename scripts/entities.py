@@ -76,6 +76,8 @@ class Entity(pygame.sprite.Sprite):
     # sets a transform
     def set_transform(self, transform):
         self.transform = pygame.math.Vector2(transform)
+        self.rect.x = self.transform.x
+        self.rect.y = self.transform.y
 
     # sets a rotation
     def set_rotation(self, rotation):
@@ -119,6 +121,11 @@ class Entity(pygame.sprite.Sprite):
         dis_x = point[0] - self.get_center()[0]
         dis_y = point[1] - self.get_center()[1]
         return math.sqrt(dis_x ** 2 + dis_y ** 2)
+    
+    def update(self, dt):
+        self.update_animation(dt)
+        self.rect.x = self.transform.x
+        self.rect.y = self.transform.y
     
 class PhysicsEntity(Entity):
     def __init__(self, transform:tuple[int, int], size:tuple[int, int], tag:str, assets:dict[str, Animation], layer=0, isScroll=True, animation="idle"):
@@ -332,3 +339,63 @@ class UserCursor(Entity):
     def cursor_in_space(self, camera_scale):
         self.location.x = self.transform.x // camera_scale
         self.location.y = self.transform.y // camera_scale
+
+class UFO(PhysicsEntity):
+    def __init__(self, transform, size, tag, assets, layer=1, isScroll=True):
+        super().__init__(transform, size, tag, assets, layer, isScroll)
+        self.arrow = Entity(transform, (32, 32), "arrow", assets, animation="enter")
+
+    def spawn(self, screenSize):
+        border = random.randint(1, 4)
+        match border:
+            case 1: # left
+                amount = random.randint(100, screenSize[1] - 20)
+                self.transform.x = self.width
+                self.transform.y = amount
+                direction = "right"
+            case 2: # right
+                amount = random.randint(100, screenSize[1] - 20)
+                self.transform.x = screenSize[0] - self.width
+                self.transform.y = amount
+                direction = "left"
+            case 3: # top
+                amount = random.randint(20, screenSize[0] - 100)
+                self.transform.x = amount
+                self.transform.y = +self.height
+                direction = "bottom"
+            case 4: # bottom
+                amount = random.randint(20, screenSize[0] - 100)
+                self.transform.x = amount
+                self.transform.y = screenSize[1] - self.height
+                direction = "top"
+
+        self.transform.x = self.transform.x - (self.width//2)
+        self.transform.y = self.transform.y - (self.height//2)
+
+        match direction:
+            case "right":
+                transform = self.get_center()
+                transform.x += self.width
+                self.arrow.set_transform(transform)
+                self.arrow.set_rotation(0)
+            case "left":
+                transform = self.get_center()
+                transform.x -= self.width
+                self.arrow.set_transform(transform)
+                self.arrow.set_rotation(180)
+            case "top":
+                transform = self.get_center()
+                transform.y -= self.height
+                self.arrow.set_transform(transform)
+                self.arrow.set_rotation(90)
+            case "bottom":
+                transform = self.get_center()
+                transform.y += self.height
+                self.arrow.set_transform(transform)
+                self.arrow.set_rotation(-90)
+        self.arrow.set_action("enter")
+
+    def update(self, dt, camera):
+        self.update_animation(dt)
+        self.rect.topleft = self.transform
+        camera.draw_rect((255, 0, 0), self.rect, 10)

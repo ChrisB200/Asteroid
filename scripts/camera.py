@@ -97,7 +97,6 @@ class Camera(pygame.sprite.Group):
 
     def draw_rect(self, colour, rect, layer=1):
         self.queue.append(("rect", colour, rect, layer))
-
     # draws the keyword arguments
     def draw_background(self, **kwargs):
         if "fill" in kwargs:

@@ -1,1 +1,6 @@
-{}
+{
+  "arrow/enter": {
+    "img_dur": 0.1,
+    "loop": true
+  }
+}

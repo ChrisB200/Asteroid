@@ -7,7 +7,7 @@ from pygame.constants import *
 # Scripts
 from scripts.camera import Window
 from scripts.settings import Settings
-from scripts.entities import Player, ModifiedSpriteGroup, UserCursor
+from scripts.entities import Player, ModifiedSpriteGroup, UFO
 from scripts.animation import load_animations
 from scripts.input import Controller, Keyboard, controller_check
 from scripts.constants import BASE_IMG_PATH
@@ -42,6 +42,8 @@ class Game():
 
         self.players = ModifiedSpriteGroup()
         self.bullets = ModifiedSpriteGroup()
+        self.ufos = ModifiedSpriteGroup()
+        self.arrows = ModifiedSpriteGroup()
         self.state = "running"
 
         self.bg = pygame.image.load("data/bg.png")
@@ -95,10 +97,24 @@ class Game():
         for bullet in self.bullets:
             bullet.update(self.dt)
 
+        for ufo in self.ufos:
+            ufo.update(self.dt, self.window.world)
+
+        for arrow in self.arrows:
+            arrow.update(self.dt)
+
     def event_handler(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.state = ""
+            if event.type == pygame.KEYDOWN:
+                if event.key == K_SPACE:
+                    ufo = UFO((0, 0), (32, 32), "ufo", self.assets)
+                    ufo.spawn(self.window.world.screenSize)
+                    self.ufos.add(ufo)
+                    self.arrows.add(ufo.arrow)
+                    self.add_to_world(ufo, ufo.arrow)
+                    print(ufo.transform)
 
             for player in self.players:
                 player.event_handler(event, self)
