@@ -1,5 +1,6 @@
 # Modules
 import pygame
+import random
 from pygame.constants import *
 import logging
 
@@ -19,6 +20,8 @@ class Window():
         self.world = Camera(self.resolution, 3, (0, 0), minScale=1, maxScale=1, panStrength=10)
         self.foreground = Camera(self.resolution, 1)
         self.ui = UserInterface(self.resolution)
+
+        self.screenShake = 0
     
     @property
     def worldScreen(self):
@@ -27,10 +30,15 @@ class Window():
     @property
     def foregroundScreen(self):
         return self.foreground.screen
+
+    def shake_screen(self, amount):
+        self.screenShake = max(amount, self.screenShake)
     
     def update(self):
         self.world.update()
         self.foreground.update()
+
+        self.screenShake = max(0, self.screenShake - 1)
 
     def draw_world(self, *args, **kwargs):
         self.world.draw(*args, **kwargs)
@@ -42,8 +50,9 @@ class Window():
         self.ui.draw()
 
     def draw(self):
+        screenShakeOffset = pygame.math.Vector2(random.random() * self.screenShake - self.screenShake / 2, random.random() * self.screenShake - self.screenShake / 2)
         self.display.fill((0, 0, 0))
-        self.display.blit(pygame.transform.scale(self.worldScreen, self.resolution), self.world.scrollDiff)
+        self.display.blit(pygame.transform.scale(self.worldScreen, (self.resolution[0] + 20, self.resolution[1] + 20)), (screenShakeOffset.x - 10 - self.world.scrollDiff.x, screenShakeOffset.y - 10 - self.world.scrollDiff.y))
         self.display.blit(self.foregroundScreen, (0, 0))
         self.display.blit(self.ui.screen, (0, 0))
 
@@ -107,7 +116,7 @@ class Camera(pygame.sprite.Group):
     def scrolling_background(self, bg, bgScroll):
         self.screen.blit(bg.image, (bg.transform.x - self.scroll.x, bgScroll - self.scroll.y))
         self.screen.blit(bg.image, (bg.transform.x - self.scroll.x, -bg.height + bgScroll - self.scroll.y))
-        print("other scrolling")
+        
     # draws the keyword arguments
     def draw_background(self, **kwargs):
         if "fill" in kwargs:

@@ -401,6 +401,7 @@ class Player(PhysicsEntity):
             if self.explosion:
                 game.explosions.add(self.explosion)
                 game.add_to_world(self.explosion)
+                game.window.shake_screen(40)
     
         if self.explosion:
             self.explosion.update(game.dt)
@@ -559,8 +560,10 @@ class UFO(PhysicsEntity):
             elif self.transform.y < -100:
                 self.kill()
 
-    def handle_collision(self, player):
-        pass
+    def handle_collision(self, sprite):
+        if sprite.tag == "spaceship":
+            self.kill()
+        super().handle_collision(sprite)
 
     def update(self, dt, camera, game):
         self.update_animation(dt)
