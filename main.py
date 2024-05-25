@@ -109,7 +109,7 @@ class Game():
                 self.state = ""
             if event.type == pygame.KEYDOWN:
                 if event.key == K_SPACE:
-                    ufo = UFO((0, 0), (32, 32), "ufo", self.assets)
+                    ufo = UFO((0, 0), (27, 14), "ufo", self.assets)
                     ufo.spawn(self.window.world.screenSize)
                     self.ufos.add(ufo)
                     self.arrows.add(ufo.arrow)
