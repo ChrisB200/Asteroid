@@ -21,7 +21,7 @@ class Particle():
         self.layer = layer
 
     def draw(self, camera):
-        camera.draw_circle(self.colour, self.transform, self.radius, self.layer)
+        camera.draw_circle(self.colour, self.transform, self.radius, layer=self.layer)
         
         lighting = circle_surf(self.lightingRadius, self.lightingCol)
         lighting_transform = self.transform.copy()

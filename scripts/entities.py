@@ -189,6 +189,8 @@ class Player(PhysicsEntity):
         self.weapon = None
         self.input = None
         self.canBeDamaged = True
+        self.damageTimer = 1
+        self.currentDamageTimer = 0
 
         center = self.get_center()
         center.y += 10
@@ -261,10 +263,13 @@ class Player(PhysicsEntity):
             self.directions["down"] = False
             self.directions["up"] = False
 
-    def update_animation_state(self):
-        pass
+    def update_timers(self, dt):
+        if self.currentDamageTimer < 0:
+            self.canBeDamaged = True
+        else:
+            self.currentDamageTimer -= dt
 
-    def update_particles(self, dt, camera, transform=None):
+    def booster_particles(self):
         yellow = Particle(
             transform=self.particles.transform, 
             velocity=(random.randint(-150, 150) / 10, 40),
@@ -272,7 +277,7 @@ class Player(PhysicsEntity):
             radius=2, 
             shrinkvel=4, 
             colour=(255, 255, 0),
-            layer=0,
+            layer=self.camLayer+2,
             lighting=True,
             lightingCol=(20, 20, 0)
         )
@@ -284,7 +289,7 @@ class Player(PhysicsEntity):
             radius=3, 
             shrinkvel=4, 
             colour=(255, 100, 0),
-            layer=0,
+            layer=self.camLayer+2,
             lighting=True,
             lightingCol=(25, 10, 0)
         )
@@ -296,11 +301,14 @@ class Player(PhysicsEntity):
             radius=2.5, 
             shrinkvel=2.5, 
             colour=(255, 200, 0),
-            layer=0,
+            layer=self.camLayer+2,
             lighting=True,
             lightingCol=(25, 20, 0)
         )
-
+        return yellow, red, orange
+    
+    def update_particles(self, dt, camera, transform=None):
+        yellow, red, orange = self.booster_particles()
         self.particles.add(yellow, red, orange)
         self.particles.update(dt, transform)
         self.particles.draw(camera)
@@ -309,6 +317,7 @@ class Player(PhysicsEntity):
         if self.canBeDamaged:
             self.canBeDamaged = False
             self.health -= damage
+            self.currentDamageTimer = self.damageTimer
             self.explosion = Entity(self.transform, (32, 32), "explosion", self.assets, self.camLayer+1, animation="explode")
 
     def handle_collision(self, sprite):
@@ -325,7 +334,45 @@ class Player(PhysicsEntity):
     
         if self.explosion:
             self.explosion.update(game.dt)
+            speedMultiplier = 1.5
 
+            white = Particle(
+                transform=self.get_center(), 
+                velocity=(random.randint(-150, 150) / speedMultiplier, random.randint(-150, 150) / speedMultiplier),
+                timer = 2,
+                radius=6, 
+                shrinkvel=7, 
+                colour=(255, 255, 255),
+                layer=self.camLayer+2,
+                lighting=True,
+                lightingCol=(50, 50, 50)
+            )
+
+            red = Particle(
+                transform=self.get_center(), 
+                velocity=(random.randint(-150, 150) / speedMultiplier, random.randint(-150, 150) / speedMultiplier),
+                timer = 2,
+                radius=6, 
+                shrinkvel=9, 
+                colour=(255, 20, 0),
+                layer=self.camLayer+2,
+                lighting=True,
+                lightingCol=(25, 10, 0)
+            )
+
+            orange = Particle(
+                transform=self.get_center(), 
+                velocity=(random.randint(-150, 150) / speedMultiplier, random.randint(-150, 150) / speedMultiplier),
+                timer = 2,
+                radius=6, 
+                shrinkvel=8, 
+                colour=(255, 100, 0),
+                layer=self.camLayer+2,
+                lighting=True,
+                lightingCol=(25, 30, 0)
+            )
+
+            self.particles.add(white, red, orange)
             if self.explosion.animation.done:
                 self.explosion.kill()
                 self.explosion = None
@@ -341,11 +388,11 @@ class Player(PhysicsEntity):
             self.movement.normalize()
 
         self.move(self.movement, tiles, dt)
-        self.update_animation_state()
         self.update_animation(dt)
         self.update_particles(dt, camera, self.transform)
         self.check_collisions(game.ufos, game.asteroids)
         self.handle_explosion(game)
+        self.update_timers(dt)
 
         if self.input:
             self.input.update()
@@ -353,7 +400,6 @@ class Player(PhysicsEntity):
             self.weapon.update(self, camera, dt, game)
         
         #camera.draw_rect((255, 0, 0), self.rect)
-
 class UserCursor(Entity):
     def __init__(self, transform, size, tag, assets, layer=0, isScroll=True):
         super().__init__(transform, size, tag, assets, layer, isScroll)
@@ -388,6 +434,7 @@ class UserCursor(Entity):
 
         self.cursor_in_space(camera.scale)
         self.update_animation(dt)
+        
 
     def cursor_in_space(self, camera_scale):
         self.location.x = self.transform.x // camera_scale
