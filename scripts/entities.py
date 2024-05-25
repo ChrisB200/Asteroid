@@ -20,6 +20,35 @@ class ModifiedSpriteGroup(pygame.sprite.Group):
 
     def get_entity(self, index):
         return self.sprites()[index]
+    
+class Background(pygame.sprite.Sprite):
+    def __init__(self, transform, image, camLayer=0, isScroll=True):
+        super().__init__()
+        self.transform = pygame.math.Vector2(transform)
+        self.img = image
+        self.size = self.img.get_width(), self.img.get_height()
+        self.camLayer = camLayer
+        self.isScroll = isScroll
+        self.rect = pygame.Rect(self.transform.x, self.transform.y, self.size[0], self.size[1])
+        self.rotation = 0
+        self.flip = False
+
+    @property
+    def width(self):
+        return self.size[0]
+    
+    @property
+    def height(self):
+        return self.size[1]
+    
+    @property
+    def image(self):
+        return pygame.transform.rotate(pygame.transform.flip(self.img, self.flip, False), self.rotation).convert_alpha()
+    
+    def update(self, dt):
+        self.update_animation(dt)
+        self.rect.x = self.transform.x
+        self.rect.y = self.transform.y
 
 class Entity(pygame.sprite.Sprite):
     def __init__(self, transform:tuple[int, int], size:tuple[int, int], tag:str, assets:dict[str, Animation], camLayer=0, isScroll=True, animation="idle"):
@@ -189,12 +218,12 @@ class Player(PhysicsEntity):
         self.weapon = None
         self.input = None
         self.canBeDamaged = True
-        self.damageTimer = 1
+        self.damageTimer = 0.3
         self.currentDamageTimer = 0
 
         center = self.get_center()
         center.y += 10
-        self.particles = ParticleSystem(self.transform, (16.5, 26))
+        self.particles = ParticleSystem(self.transform, (13.5, 17))
         self.explosion = None
         self.set_action("idle")
 
@@ -305,11 +334,52 @@ class Player(PhysicsEntity):
             lighting=True,
             lightingCol=(25, 20, 0)
         )
-        return yellow, red, orange
+        
+        self.particles.add(yellow, red, orange)
+    
+    def explosion_particles(self):
+        speedMultiplier = 1.5
+
+        white = Particle(
+            transform=self.get_center(), 
+            velocity=(random.randint(-150, 150) / speedMultiplier, random.randint(-150, 150) / speedMultiplier),
+            timer = 2,
+            radius=6, 
+            shrinkvel=7, 
+            colour=(255, 255, 255),
+            layer=self.camLayer+2,
+            lighting=True,
+            lightingCol=(50, 50, 50)
+        )
+
+        red = Particle(
+            transform=self.get_center(), 
+            velocity=(random.randint(-150, 150) / speedMultiplier, random.randint(-150, 150) / speedMultiplier),
+            timer = 2,
+            radius=6, 
+            shrinkvel=9, 
+            colour=(255, 20, 0),
+            layer=self.camLayer+2,
+            lighting=True,
+            lightingCol=(25, 10, 0)
+        )
+
+        orange = Particle(
+            transform=self.get_center(), 
+            velocity=(random.randint(-150, 150) / speedMultiplier, random.randint(-150, 150) / speedMultiplier),
+            timer = 2,
+            radius=6, 
+            shrinkvel=8, 
+            colour=(255, 100, 0),
+            layer=self.camLayer+2,
+            lighting=True,
+            lightingCol=(25, 30, 0)
+        )
+
+        self.particles.add(white, red, orange)
     
     def update_particles(self, dt, camera, transform=None):
-        yellow, red, orange = self.booster_particles()
-        self.particles.add(yellow, red, orange)
+        self.booster_particles()
         self.particles.update(dt, transform)
         self.particles.draw(camera)
 
@@ -334,45 +404,8 @@ class Player(PhysicsEntity):
     
         if self.explosion:
             self.explosion.update(game.dt)
-            speedMultiplier = 1.5
-
-            white = Particle(
-                transform=self.get_center(), 
-                velocity=(random.randint(-150, 150) / speedMultiplier, random.randint(-150, 150) / speedMultiplier),
-                timer = 2,
-                radius=6, 
-                shrinkvel=7, 
-                colour=(255, 255, 255),
-                layer=self.camLayer+2,
-                lighting=True,
-                lightingCol=(50, 50, 50)
-            )
-
-            red = Particle(
-                transform=self.get_center(), 
-                velocity=(random.randint(-150, 150) / speedMultiplier, random.randint(-150, 150) / speedMultiplier),
-                timer = 2,
-                radius=6, 
-                shrinkvel=9, 
-                colour=(255, 20, 0),
-                layer=self.camLayer+2,
-                lighting=True,
-                lightingCol=(25, 10, 0)
-            )
-
-            orange = Particle(
-                transform=self.get_center(), 
-                velocity=(random.randint(-150, 150) / speedMultiplier, random.randint(-150, 150) / speedMultiplier),
-                timer = 2,
-                radius=6, 
-                shrinkvel=8, 
-                colour=(255, 100, 0),
-                layer=self.camLayer+2,
-                lighting=True,
-                lightingCol=(25, 30, 0)
-            )
-
-            self.particles.add(white, red, orange)
+            self.explosion_particles()
+          
             if self.explosion.animation.done:
                 self.explosion.kill()
                 self.explosion = None
@@ -420,7 +453,6 @@ class UserCursor(Entity):
             y = 0
         elif y > camera.resolution[1]:
             y = camera.resolution[1]
-
         
         if isinstance(player.input, Controller):
             x += round(player.input.rightStick[0] * 5)
@@ -514,7 +546,7 @@ class UFO(PhysicsEntity):
     def movement_directions(self):
         self.movement.x = (0 if self.canMove == False else 1 if self.directions["right"] else -1 if self.directions["left"] else 0) * self.speed
         self.movement.y = (0 if self.canMove == False else 1 if self.directions["down"] else -1 if self.directions["up"] else 0) * self.speed
-        self.rect.topleft = self.transform
+        self.rect.center = self.transform
 
     def check_bounds(self, screenSize):
         if self.canMove:
@@ -538,6 +570,7 @@ class UFO(PhysicsEntity):
         self.move(self.movement, [], dt)
         self.check_bounds(camera.screenSize)
         self.check_collisions(game.players, game.asteroids)
+        camera.draw_rect((255, 0, 0), self.rect)
 
 class Asteroid(PhysicsEntity):
     def __init__(self, transform, size, tag, assets, layer=1, isScroll=True, animation="idle"):

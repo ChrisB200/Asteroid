@@ -7,7 +7,7 @@ from pygame.constants import *
 # Scripts
 from scripts.camera import Window
 from scripts.settings import Settings
-from scripts.entities import Player, ModifiedSpriteGroup, UFO
+from scripts.entities import Player, ModifiedSpriteGroup, UFO, Background
 from scripts.animation import load_animations
 from scripts.input import Controller, Keyboard, controller_check
 from scripts.constants import BASE_IMG_PATH
@@ -48,7 +48,9 @@ class Game():
         self.explosions = ModifiedSpriteGroup()
         self.state = "running"
 
-        self.bg = pygame.image.load("data/bg.png")
+        self.bgImage = pygame.image.load("data/bg.png")
+        self.background = Background((0, 0), self.bgImage, -10)
+        self.bgScroll = 1
 
     def add_to_world(self, *sprites):
         self.window.world.add(*sprites)
@@ -71,7 +73,7 @@ class Game():
 
     def create_player(self, pos, input=0, layer=0):
         numOfPlayers = len(self.players.sprites())
-        player = Player(numOfPlayers, pos, (32, 32), "spaceship", self.assets, layer)
+        player = Player(numOfPlayers, pos, (26, 17), "spaceship", self.assets, layer)
 
         input = self.inputDevices[input]
         player.input = input
@@ -84,18 +86,24 @@ class Game():
 
     # draws the window
     def draw(self):
-        self.window.draw_world(image=self.bg)
+        self.window.world.draw_scrolling_background(self.background, self.bgScroll)
+        self.window.draw_world()
         self.window.draw_foreground()
         self.window.draw()
         pygame.display.flip()
 
+    def scroll_background(self):
+        self.bgScroll += self.dt * 75
+        if self.bgScroll >= self.background.height:
+            self.bgScroll = 0
+
     def update(self):
         self.window.update()
+        self.scroll_background()
 
         player: Player
         for player in self.players:
             player.update([], self.dt, self.window.world, self)
-            print(player.health)
         
         for bullet in self.bullets:
             bullet.update(self.dt)
@@ -112,7 +120,7 @@ class Game():
                 self.state = ""
             if event.type == pygame.KEYDOWN:
                 if event.key == K_SPACE:
-                    ufo = UFO((0, 0), (32, 32), "ufo", self.assets)
+                    ufo = UFO((0, 0), (24, 19), "ufo", self.assets)
                     ufo.spawn(self.window.world.screenSize)
                     self.ufos.add(ufo)
                     self.arrows.add(ufo.arrow)

@@ -100,6 +100,14 @@ class Camera(pygame.sprite.Group):
 
     def draw_surface(self, surf, transform, flags, layer=1):
         self.queue.append(("surface", surf, transform, flags, layer))
+
+    def draw_scrolling_background(self, bg, bgScroll):
+        self.queue.append(("background", bg, bgScroll, bg.camLayer))
+
+    def scrolling_background(self, bg, bgScroll):
+        self.screen.blit(bg.image, (bg.transform.x - self.scroll.x, bgScroll - self.scroll.y))
+        self.screen.blit(bg.image, (bg.transform.x - self.scroll.x, -bg.height + bgScroll - self.scroll.y))
+        print("other scrolling")
     # draws the keyword arguments
     def draw_background(self, **kwargs):
         if "fill" in kwargs:
@@ -121,6 +129,8 @@ class Camera(pygame.sprite.Group):
         for item in sorted_queue:
             if isinstance(item, tuple):
                 match item[0]:
+                    case "background":
+                        self.scrolling_background(item[1], item[2])
                     case "line":
                         pygame.draw.line(self.screen, item[1], item[2] - self.scroll, item[3] - self.scroll, item[4])
                         pygame.draw.circle(self.screen, (255, 0, 0), item[2] - self.scroll, 3)
