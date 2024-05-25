@@ -170,7 +170,6 @@ class Player(PhysicsEntity):
         self.id = id
         self.speed = 150
         self.weapon = None
-        self.directions = {"up": False, "down": False, "left": False, "right": False}
         self.input = None
 
         center = self.get_center()
@@ -250,28 +249,37 @@ class Player(PhysicsEntity):
         yellow = Particle(
             transform=self.particles.transform, 
             velocity=(random.randint(-150, 150) / 10, 40),
+            timer = 2,
             radius=2, 
-            shrinkvel=1.5, 
+            shrinkvel=4, 
             colour=(255, 255, 0),
-            layer=0
+            layer=0,
+            lighting=True,
+            lightingCol=(20, 20, 0)
         )
 
         red = Particle(
             transform=self.particles.transform, 
             velocity=(random.randint(-150, 150) / 10, 40),
+            timer = 2,
             radius=3, 
             shrinkvel=4, 
             colour=(255, 100, 0),
-            layer=0
+            layer=0,
+            lighting=True,
+            lightingCol=(25, 10, 0)
         )
 
         orange = Particle(
             transform=self.particles.transform, 
             velocity=(random.randint(-150, 150) / 10, 40),
+            timer = 2,
             radius=2.5, 
             shrinkvel=2.5, 
             colour=(255, 200, 0),
-            layer=0
+            layer=0,
+            lighting=True,
+            lightingCol=(25, 20, 0)
         )
 
         #red = Particle(self.particles.transform, (random.randint(0, 20) / 10 -1, random.randint(4, 6)), 6, 0.75, False, 0.3, (255, 200, 0))
@@ -344,30 +352,33 @@ class UFO(PhysicsEntity):
     def __init__(self, transform, size, tag, assets, layer=1, isScroll=True):
         super().__init__(transform, size, tag, assets, layer, isScroll)
         self.arrow = Entity(transform, (32, 32), "arrow", assets, animation="enter")
+        self.speed = 150
+        self.changeRotation = 1
+        self.rotationSpeed = 50
 
     def spawn(self, screenSize):
         border = random.randint(1, 4)
         match border:
             case 1: # left
                 amount = random.randint(100, screenSize[1] - 20)
-                self.transform.x = self.width
+                self.transform.x = -self.width
                 self.transform.y = amount
                 direction = "right"
             case 2: # right
                 amount = random.randint(100, screenSize[1] - 20)
-                self.transform.x = screenSize[0] - self.width
+                self.transform.x = screenSize[0] + self.width
                 self.transform.y = amount
                 direction = "left"
             case 3: # top
                 amount = random.randint(20, screenSize[0] - 100)
                 self.transform.x = amount
-                self.transform.y = +self.height
-                direction = "bottom"
+                self.transform.y = -self.height
+                direction = "down"
             case 4: # bottom
                 amount = random.randint(20, screenSize[0] - 100)
                 self.transform.x = amount
-                self.transform.y = screenSize[1] - self.height
-                direction = "top"
+                self.transform.y = screenSize[1] + self.height
+                direction = "up"
 
         self.transform.x = self.transform.x - (self.width//2)
         self.transform.y = self.transform.y - (self.height//2)
@@ -375,7 +386,6 @@ class UFO(PhysicsEntity):
         match direction:
             case "right":
                 transform = self.get_center()
-                transform.x += self.width
                 self.arrow.set_transform(transform)
                 self.arrow.set_rotation(0)
             case "left":
@@ -383,19 +393,37 @@ class UFO(PhysicsEntity):
                 transform.x -= self.width
                 self.arrow.set_transform(transform)
                 self.arrow.set_rotation(180)
-            case "top":
+            case "up":
                 transform = self.get_center()
                 transform.y -= self.height
                 self.arrow.set_transform(transform)
                 self.arrow.set_rotation(90)
-            case "bottom":
+            case "down":
                 transform = self.get_center()
-                transform.y += self.height
                 self.arrow.set_transform(transform)
                 self.arrow.set_rotation(-90)
+        
+        self.directions[direction] = True
         self.arrow.set_action("enter")
 
+    def ufo_rotating_animation(self, dt):
+        self.rotation += self.rotationSpeed * dt * self.changeRotation
+        self.rect = self.image.get_rect(center=self.transform)
+
+        if self.rotation >= 12:
+            self.changeRotation = -1
+        elif self.rotation <= -12:
+            self.changeRotation = 1
+
+    def movement_directions(self):
+        self.movement.x = (1 if self.directions["right"] else -1 if self.directions["left"] else 0) * self.speed
+        self.movement.y = (1 if self.directions["down"] else -1 if self.directions["up"] else 0) * self.speed
+        
     def update(self, dt, camera):
         self.update_animation(dt)
+        self.ufo_rotating_animation(dt)
         self.rect.topleft = self.transform
-        camera.draw_rect((255, 0, 0), self.rect, 10)
+        
+        self.movement_directions()
+        self.move(self.movement, [], dt)
+        #camera.draw_rect((255, 0, 0), self.rect, 10)

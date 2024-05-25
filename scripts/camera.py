@@ -97,6 +97,9 @@ class Camera(pygame.sprite.Group):
 
     def draw_rect(self, colour, rect, layer=1):
         self.queue.append(("rect", colour, rect, layer))
+
+    def draw_surface(self, surf, transform, flags, layer=1):
+        self.queue.append(("surface", surf, transform, flags, layer))
     # draws the keyword arguments
     def draw_background(self, **kwargs):
         if "fill" in kwargs:
@@ -122,6 +125,8 @@ class Camera(pygame.sprite.Group):
                         pygame.draw.line(self.screen, item[1], item[2] - self.scroll, item[3] - self.scroll, item[4])
                         pygame.draw.circle(self.screen, (255, 0, 0), item[2] - self.scroll, 3)
                         pygame.draw.circle(self.screen, (0, 255, 0), item[3] - self.scroll, 3)
+                    case "surface":
+                        self.screen.blit(item[1], item[2] - self.scroll, special_flags=item[3])
                     case "rect":
                         rect = item[2].copy()  # Assuming rect has a copy method or use `pygame.Rect` methods if it's a Rect
                         rect.x -= self.scroll.x

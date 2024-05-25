@@ -129,7 +129,7 @@ class Game():
             self.event_handler()
             self.update()
             self.draw()
-            #print(int(self.clock.get_fps()))
+            print(int(self.clock.get_fps()))
             
 if __name__ == "__main__":
     game = Game()
