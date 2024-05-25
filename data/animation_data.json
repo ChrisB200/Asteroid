@@ -1,6 +1,16 @@
 {
   "arrow/enter": {
     "img_dur": 0.1,
+    "loop": false
+  },
+
+  "arrow/idle": {
+    "img_dur": 0.1,
     "loop": true
+  },
+
+  "arrow/exit": {
+    "img_dur": 0.1,
+    "loop": false
   }
 }

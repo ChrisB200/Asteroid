@@ -43,6 +43,7 @@ class Game():
         self.players = ModifiedSpriteGroup()
         self.bullets = ModifiedSpriteGroup()
         self.ufos = ModifiedSpriteGroup()
+        self.asteroids = ModifiedSpriteGroup()
         self.arrows = ModifiedSpriteGroup()
         self.state = "running"
 
@@ -93,12 +94,13 @@ class Game():
         player: Player
         for player in self.players:
             player.update([], self.dt, self.window.world, self)
+            print(player.health)
         
         for bullet in self.bullets:
             bullet.update(self.dt)
 
         for ufo in self.ufos:
-            ufo.update(self.dt, self.window.world)
+            ufo.update(self.dt, self.window.world, self)
 
         for arrow in self.arrows:
             arrow.update(self.dt)
@@ -109,7 +111,7 @@ class Game():
                 self.state = ""
             if event.type == pygame.KEYDOWN:
                 if event.key == K_SPACE:
-                    ufo = UFO((0, 0), (27, 14), "ufo", self.assets)
+                    ufo = UFO((0, 0), (32, 32), "ufo", self.assets)
                     ufo.spawn(self.window.world.screenSize)
                     self.ufos.add(ufo)
                     self.arrows.add(ufo.arrow)
@@ -129,7 +131,7 @@ class Game():
             self.event_handler()
             self.update()
             self.draw()
-            print(int(self.clock.get_fps()))
+            #print(int(self.clock.get_fps()))
             
 if __name__ == "__main__":
     game = Game()

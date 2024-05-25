@@ -38,6 +38,7 @@ class Entity(pygame.sprite.Sprite):
         self.directions: dict[str, bool] = {"left" : False, "right": False, "up": False, "down": False}
         self.movement = pygame.math.Vector2()
         self.speed = 100
+        self.canRemove = False
         
         # animation
         self.action: str = ""
@@ -133,7 +134,7 @@ class PhysicsEntity(Entity):
         super().__init__(transform, size, tag, assets, layer, isScroll, animation)
         # Rects and Collisions
         self.collisions: dict[str, bool] = {'bottom': False, 'top': False, 'left': False, 'right': False}
-
+        self.entityCollisions = ModifiedSpriteGroup()
     # Checks for collisions based on movement direction
     def move(self, movement, tiles, dt):
         # x-axis
@@ -164,13 +165,30 @@ class PhysicsEntity(Entity):
         self.transform.y = int(self.rect.y)
         self.collisions = objectCollisions
 
+    def check_collisions(self, *groups):
+        for group in groups:
+            for sprite in group:
+                if self.rect.colliderect(sprite.rect):
+                    self.handle_collision(sprite)
+                    sprite.handle_collision(self)
+                else:
+                    if self.entityCollisions.has(sprite):
+                        self.entityCollisions.remove(sprite)
+                        sprite.entityCollisions.remove(self)
+
+    def handle_collision(self, other):
+        if not self.entityCollisions.has(other):
+            self.entityCollisions.add(other)
+
 class Player(PhysicsEntity):
     def __init__(self, id:int, transform:tuple[int, int], size:tuple[int, int], tag:str, assets:dict[str, Animation], layer=0, isScroll=True, animation="idle"):
         super().__init__(transform, size, tag, assets, layer, isScroll, animation)
         self.id = id
         self.speed = 150
+        self.health = 200
         self.weapon = None
         self.input = None
+        self.canBeDamaged = True
 
         center = self.get_center()
         center.y += 10
@@ -282,11 +300,20 @@ class Player(PhysicsEntity):
             lightingCol=(25, 20, 0)
         )
 
-        #red = Particle(self.particles.transform, (random.randint(0, 20) / 10 -1, random.randint(4, 6)), 6, 0.75, False, 0.3, (255, 200, 0))
-        #orange = Particle(self.particles.transform, (random.randint(0, 20) / 10 -1, random.randint(4, 6)), 6, 0.75, False, 0.3, (255, 100, 0))
         self.particles.add(yellow, red, orange)
         self.particles.update(dt, transform)
         self.particles.draw(camera)
+
+    def take_damage(self, damage):
+        if self.canBeDamaged:
+            self.canBeDamaged = False
+            self.health -= damage
+
+    def handle_collision(self, sprite):
+        if sprite.tag == "ufo":
+            if not self.entityCollisions.has(sprite):
+                self.take_damage(sprite.damage)
+        super().handle_collision(sprite)
 
     def update(self, tiles, dt, camera: Camera, game):
         self.movement.x = (-1 if self.directions["left"] else 1 if self.directions["right"] else 0) * self.speed
@@ -302,6 +329,7 @@ class Player(PhysicsEntity):
         self.update_animation_state()
         self.update_animation(dt)
         self.update_particles(dt, camera, self.transform)
+        self.check_collisions(game.ufos, game.asteroids)
 
         if self.input:
             self.input.update()
@@ -351,29 +379,32 @@ class UserCursor(Entity):
 class UFO(PhysicsEntity):
     def __init__(self, transform, size, tag, assets, layer=1, isScroll=True):
         super().__init__(transform, size, tag, assets, layer, isScroll)
-        self.arrow = Entity(transform, (32, 32), "arrow", assets, animation="enter")
+        self.arrow = Entity(transform, (27, 14), "arrow", assets, animation="enter")
         self.speed = 150
         self.changeRotation = 1
         self.rotationSpeed = 50
-        self.spawnTime = 100
+        self.spawnTime = 1
+        self.currentSpawnTime = self.spawnTime
+        self.canMove = False
+        self.damage = 20
 
     def spawn(self, screenSize):
-        border = random.randint(1, 4)
-        offset = 25
+        border = random.randint(1, 2)
+        offset = pygame.math.Vector2(25, 10)
         match border:
             case 1: # left
                 amount = random.randint(100, screenSize[1] - 20)
                 self.transform.x = -self.width
                 self.transform.y = amount
-                self.arrow.set_transform((offset, amount + (self.arrow.height//2)))
+                self.arrow.set_transform((offset.x - (self.arrow.width//2), amount - offset.y))
                 self.arrow.set_rotation(0)
                 direction = "right"
             case 2: # right
                 amount = random.randint(100, screenSize[1] - 20)
                 self.transform.x = screenSize[0] + self.width
                 self.transform.y = amount
-                self.arrow.set_transform((screenSize[0] - offset, amount + (self.arrow.height//2)))
-                self.arrow.set_rotation(180)
+                self.arrow.set_transform((screenSize[0] - offset.x - (self.arrow.width//2), amount - offset.y))
+                self.arrow.flip = True
                 direction = "left"
             case 3: # top
                 amount = random.randint(20, screenSize[0] - 100)
@@ -386,8 +417,8 @@ class UFO(PhysicsEntity):
                 amount = random.randint(20, screenSize[0] - 100)
                 self.transform.x = amount
                 self.transform.y = screenSize[1] + self.height
-                self.arrow.set_transform((screenSize[1] - amount + (self.arrow.width//2), offset))
-                self.arrow.set_rotation(-90)
+                self.arrow.set_transform((amount + (self.arrow.width//2), screenSize[1] - offset - (self.arrow.width//2)))
+                self.arrow.set_rotation(90)
                 direction = "up"
 
         self.transform.x = self.transform.x - (self.width//2)
@@ -395,6 +426,17 @@ class UFO(PhysicsEntity):
 
         self.directions[direction] = True
         self.arrow.set_action("enter")
+
+    def update_timers(self, dt):
+        if self.currentSpawnTime < 0:
+            self.arrow.set_action("exit")
+
+            if self.arrow.animation.done:
+                self.arrow.kill()
+                self.canMove = True
+        else:
+            self.arrow.set_action("idle")
+            self.currentSpawnTime -= dt
 
     def ufo_rotating_animation(self, dt):
         self.rotation += self.rotationSpeed * dt * self.changeRotation
@@ -406,15 +448,33 @@ class UFO(PhysicsEntity):
             self.changeRotation = 1
 
     def movement_directions(self):
-        self.movement.x = (1 if self.directions["right"] else -1 if self.directions["left"] else 0) * self.speed
-        self.movement.y = (1 if self.directions["down"] else -1 if self.directions["up"] else 0) * self.speed
-        
-    def update(self, dt, camera):
+        self.movement.x = (0 if self.canMove == False else 1 if self.directions["right"] else -1 if self.directions["left"] else 0) * self.speed
+        self.movement.y = (0 if self.canMove == False else 1 if self.directions["down"] else -1 if self.directions["up"] else 0) * self.speed
+        self.rect.topleft = self.transform
+
+    def check_bounds(self, screenSize):
+        if self.canMove:
+            if self.transform.x > screenSize[0] + 100:
+                self.kill()
+            elif self.transform.x < -100:
+                self.kill()
+            elif self.transform.y > screenSize[1] + 100:
+                self.kill()
+            elif self.transform.y < -100:
+                self.kill()
+
+    def handle_collision(self, player):
+        pass
+
+    def update(self, dt, camera, game):
         self.update_animation(dt)
         self.ufo_rotating_animation(dt)
-        self.rect.topleft = self.transform
-        self.arrow.rect.topleft = self.transform
-        
+        self.update_timers(dt)
         self.movement_directions()
         self.move(self.movement, [], dt)
-        camera.draw_rect((0, 255, 0), self.arrow.rect, 0)
+        self.check_bounds(camera.screenSize)
+        self.check_collisions(game.players, game.asteroids)
+
+class Asteroid(PhysicsEntity):
+    def __init__(self, transform, size, tag, assets, layer=1, isScroll=True, animation="idle"):
+        super().__init__(transform, size, tag, assets, layer, isScroll, animation)
