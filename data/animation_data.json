@@ -13,8 +13,16 @@
     "img_dur": 0.1,
     "loop": false
   },
-  "explosion/explode": {
+  "explosion/idle": {
     "img_dur": 0.03,
     "loop": false
+  },
+  "lasarbeam/hit": {
+    "img_dur": 0.02,
+    "loop": false
+  },
+  "lasarbeam/idle": {
+    "img_dur": 0.1,
+    "loop": true
   }
 }

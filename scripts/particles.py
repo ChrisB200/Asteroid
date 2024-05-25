@@ -22,11 +22,12 @@ class Particle():
 
     def draw(self, camera):
         camera.draw_circle(self.colour, self.transform, self.radius, layer=self.layer)
-        
-        lighting = circle_surf(self.lightingRadius, self.lightingCol)
-        lighting_transform = self.transform.copy()
-        lighting_transform.x -= self.lightingRadius
-        camera.draw_surface(lighting, lighting_transform, BLEND_RGB_ADD, 20)
+
+        if self.lighting:
+            lighting = circle_surf(self.lightingRadius, self.lightingCol)
+            lighting_transform = self.transform.copy()
+            lighting_transform.x -= self.lightingRadius
+            camera.draw_surface(lighting, lighting_transform, BLEND_RGB_ADD, 20)
 
     def update(self, dt):
         movement = pygame.math.Vector2(self.velocity.x * dt, self.velocity.y * dt)

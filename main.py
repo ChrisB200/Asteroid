@@ -7,10 +7,11 @@ from pygame.constants import *
 # Scripts
 from scripts.camera import Window
 from scripts.settings import Settings
-from scripts.entities import Player, ModifiedSpriteGroup, UFO, Background
+from scripts.entities import Player, ModifiedSpriteGroup, UFO, Background, Asteroid
 from scripts.animation import load_animations
 from scripts.input import Controller, Keyboard, controller_check
 from scripts.constants import BASE_IMG_PATH
+from scripts.projectile import Weapon, Projectile
 
 # configure the logger
 logging.basicConfig(
@@ -41,7 +42,7 @@ class Game():
         self.dt = 1
 
         self.players = ModifiedSpriteGroup()
-        self.bullets = ModifiedSpriteGroup()
+        self.projectiles = ModifiedSpriteGroup()
         self.ufos = ModifiedSpriteGroup()
         self.asteroids = ModifiedSpriteGroup()
         self.arrows = ModifiedSpriteGroup()
@@ -51,6 +52,9 @@ class Game():
         self.bgImage = pygame.image.load("data/bg.png")
         self.background = Background((0, 0), self.bgImage, -10)
         self.bgScroll = 1
+
+        self.DEFAULT_PROJECTILE = Projectile((0, 0), (13, 13), "lasarbeam", self.assets, layer=5)
+        self.DEFAULT_WEAPON = Weapon(50, 1, True, 0.5, self.DEFAULT_PROJECTILE, [[3, -5], [-16, -5]])
 
     def add_to_world(self, *sprites):
         self.window.world.add(*sprites)
@@ -76,7 +80,10 @@ class Game():
         player = Player(numOfPlayers, pos, (26, 17), "spaceship", self.assets, layer)
 
         input = self.inputDevices[input]
+        weapon = self.DEFAULT_WEAPON.copy()
+
         player.input = input
+        player.weapon = weapon
 
         self.players.add(player)
         self.add_to_world(player)
@@ -105,14 +112,17 @@ class Game():
         for player in self.players:
             player.update([], self.dt, self.window.world, self)
         
-        for bullet in self.bullets:
-            bullet.update(self.dt)
+        for projectile in self.projectiles:
+            projectile.update(self.dt, self)
 
         for ufo in self.ufos:
             ufo.update(self.dt, self.window.world, self)
 
         for arrow in self.arrows:
             arrow.update(self.dt)
+
+        for asteroid in self.asteroids:
+            asteroid.update(self.dt, self)
 
     def event_handler(self):
         for event in pygame.event.get():
@@ -125,6 +135,11 @@ class Game():
                     self.ufos.add(ufo)
                     self.arrows.add(ufo.arrow)
                     self.add_to_world(ufo, ufo.arrow)
+                if event.key == pygame.K_q:
+                    asteroid = Asteroid((0, 0), (40, 38), "asteroid", self.assets)
+                    asteroid.spawn(self.window.world.screenSize[0], self.window.world.screenSize[1], self.window.world)
+                    self.asteroids.add(asteroid)
+                    self.add_to_world(asteroid)
 
             for player in self.players:
                 player.event_handler(event, self)

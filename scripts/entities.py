@@ -197,7 +197,7 @@ class PhysicsEntity(Entity):
     def check_collisions(self, *groups):
         for group in groups:
             for sprite in group:
-                if self.rect.colliderect(sprite.rect):
+                if pygame.sprite.collide_mask(self, sprite):
                     self.handle_collision(sprite)
                     sprite.handle_collision(self)
                 else:
@@ -247,6 +247,12 @@ class Player(PhysicsEntity):
             if event.key == self.input.controls.reload:
                 if self.weapon:
                     self.weapon.reload()
+            if event.key == self.input.controls.shoot:
+                if self.weapon:
+                    if self.weapon.isAutomatic:
+                        self.weapon.shooting = True
+                    else:
+                        self.weapon.shoot(game, self.transform)
 
         elif event.type == pygame.KEYUP:
             if event.key == self.input.controls.moveLeft:
@@ -257,19 +263,10 @@ class Player(PhysicsEntity):
                 self.directions["up"] = False
             if event.key == self.input.controls.moveDown:
                 self.directions["down"] = False
-
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == self.input.controls.shoot:
+            if event.key == self.input.controls.shoot:
                 if self.weapon:
                     if self.weapon.isAutomatic:
-                        self.weapon.shooting = True
-                    else:
-                        self.weapon.shoot(game)
-
-        if event.type == pygame.MOUSEBUTTONUP:
-            if self.weapon:
-                if self.weapon.isAutomatic:
-                    self.weapon.shooting = False
+                        self.weapon.shooting = False
 
     def controller_input(self, event, game):
         if self.input.leftStick.x > 0:
@@ -336,6 +333,41 @@ class Player(PhysicsEntity):
         )
         
         self.particles.add(yellow, red, orange)
+
+    def asteroid_particles(self):
+        speedMultiplier = 1.4
+
+        brown = Particle(
+            transform=self.get_center(), 
+            velocity=(random.randint(-200, 200) / speedMultiplier, random.randint(-200, 200) / speedMultiplier),
+            timer = 2,
+            radius=2, 
+            shrinkvel=4,
+            colour=(50, 50, 50),
+            layer=self.camLayer+2,
+        )
+
+        darkbrown = Particle(
+            transform=self.get_center(), 
+            velocity=(random.randint(-200, 200) / speedMultiplier, random.randint(-200, 200) / speedMultiplier),
+            timer = 2,
+            radius=2, 
+            shrinkvel=4, 
+            colour= (100, 100, 100),
+            layer=self.camLayer+2,
+        )
+
+        black = Particle(
+            transform=self.get_center(), 
+            velocity=(random.randint(-200, 200) / speedMultiplier, random.randint(-200, 200) / speedMultiplier),
+            timer = 2,
+            radius=2, 
+            shrinkvel=4, 
+            colour= (150, 150, 150),
+            layer=self.camLayer+2,
+        )
+        
+        self.particles.add(brown, darkbrown, black)
     
     def explosion_particles(self):
         speedMultiplier = 1.5
@@ -388,10 +420,10 @@ class Player(PhysicsEntity):
             self.canBeDamaged = False
             self.health -= damage
             self.currentDamageTimer = self.damageTimer
-            self.explosion = Entity(self.transform, (32, 32), "explosion", self.assets, self.camLayer+1, animation="explode")
+            self.explosion = Entity(self.transform, (32, 32), "explosion", self.assets, self.camLayer+1)
 
     def handle_collision(self, sprite):
-        if sprite.tag == "ufo":
+        if sprite.tag == "ufo" or sprite.tag == "asteroid":
             if not self.entityCollisions.has(sprite):
                 self.take_damage(sprite.damage)
         super().handle_collision(sprite)
@@ -406,6 +438,7 @@ class Player(PhysicsEntity):
         if self.explosion:
             self.explosion.update(game.dt)
             self.explosion_particles()
+            self.asteroid_particles()
           
             if self.explosion.animation.done:
                 self.explosion.kill()
@@ -431,7 +464,7 @@ class Player(PhysicsEntity):
         if self.input:
             self.input.update()
         if self.weapon:
-            self.weapon.update(self, camera, dt, game)
+            self.weapon.update(game, self.get_center())
         
         #camera.draw_rect((255, 0, 0), self.rect)
 class UserCursor(Entity):
@@ -578,3 +611,44 @@ class UFO(PhysicsEntity):
 class Asteroid(PhysicsEntity):
     def __init__(self, transform, size, tag, assets, layer=1, isScroll=True, animation="idle"):
         super().__init__(transform, size, tag, assets, layer, isScroll, animation)
+        self.targetTransform = pygame.math.Vector2()
+        self.speed = 100
+        self.localRotation = 0
+        self.localRotationSpeed = 100
+        self.damage = 30
+        self.health = 100
+
+    @property
+    def image(self):
+        rotated_image = pygame.transform.rotate(pygame.transform.scale2x(self.animation.img()), self.localRotation)
+        self.rect = rotated_image.get_rect(center=self.get_center())
+        return rotated_image
+
+    def calculate_direction(self) -> pygame.math.Vector2:
+        direction = super().calculate_direction()
+        direction *= self.speed
+        return direction
+
+    def calculate_rotation(self, camera):
+        self.rotation = self.get_point_angle(self.targetTransform, camera.scroll)
+
+    def spawn(self, width, height, camera):
+        self.set_transform((random.randint(0, width), -60))
+        self.targetTransform.x = random.randint(0, width)
+        self.targetTransform.y = height + 60
+        self.calculate_rotation(camera)
+        self.direction = self.calculate_direction()
+
+    def handle_collision(self, sprite):
+        if sprite.tag == "spaceship":
+            self.kill()
+        super().handle_collision(sprite)
+        
+    def update(self, dt, game):    
+        self.move(self.direction, [], dt)
+        self.animation.update(dt)
+        self.check_collisions(game.players)
+
+
+
+
