@@ -47,6 +47,7 @@ class Game():
         self.asteroids = ModifiedSpriteGroup()
         self.arrows = ModifiedSpriteGroup()
         self.explosions = ModifiedSpriteGroup()
+        self.other = ModifiedSpriteGroup()
         self.state = "running"
 
         self.bgImage = pygame.image.load("data/bg.png")
@@ -54,7 +55,7 @@ class Game():
         self.bgScroll = 1
 
         self.DEFAULT_PROJECTILE = Projectile((0, 0), (13, 13), "lasarbeam", self.assets, layer=5)
-        self.DEFAULT_WEAPON = Weapon(50, 1, True, 0.5, self.DEFAULT_PROJECTILE, [[3, -5], [-16, -5]])
+        self.DEFAULT_WEAPON = Weapon(50, 1, True, 0.1, self.DEFAULT_PROJECTILE, [[3, -5], [-16, -5]])
 
     def add_to_world(self, *sprites):
         self.window.world.add(*sprites)

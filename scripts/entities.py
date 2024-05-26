@@ -90,6 +90,8 @@ class Entity(pygame.sprite.Sprite):
     def image(self):
         return pygame.transform.rotate(pygame.transform.flip(self.animation.img(), self.flip, False), self.rotation).convert_alpha()
 
+    def copy(self):
+        return self.__class__(self.transform, self.size, self.tag, self.assets, self.camLayer, self.isScroll, self.anim)
     # sets an animation action
     def set_action(self, action):
         if action != self.action:
@@ -221,11 +223,27 @@ class Player(PhysicsEntity):
         self.damageTimer = 0.3
         self.currentDamageTimer = 0
 
+        self.acceleration = pygame.math.Vector2()
+        self.velocity = pygame.math.Vector2()
+        self.maxSpeed = 200
+        self.accelerationRate = 1000  # acceleration rate
+        self.friction = 0.95  # friction factor to gradually slow down
+
+        self.dashSpeed = 500
+        self.dashDuration = 0.2
+        self.dashCooldown = 1.0
+        self.isDashing = False
+        self.dashTimer = 0
+        self.dashCooldownTimer = 0
+        self.dashDirection = pygame.math.Vector2()
+
         center = self.get_center()
         center.y += 10
         self.particles = ParticleSystem(self.transform, (13.5, 17))
         self.explosion = None
         self.set_action("idle")
+        self.loadingSpinnerTemplate = Entity(self.get_center(), (16, 16), "spinner", self.assets, self.camLayer + 1)
+        self.spinner = None
 
     def event_handler(self, event, game):
         if self.input is not None:
@@ -246,13 +264,20 @@ class Player(PhysicsEntity):
                 self.directions["down"] = True
             if event.key == self.input.controls.reload:
                 if self.weapon:
-                    self.weapon.reload()
+                    if self.weapon.canReload:
+                        if self.weapon.magazine < self.weapon.maxMagazine:
+                            print("yes")
+                            self.weapon.reload()
+                            self.spinner = self.loadingSpinnerTemplate.copy()
+                            game.add_to_world(self.spinner)
             if event.key == self.input.controls.shoot:
                 if self.weapon:
                     if self.weapon.isAutomatic:
                         self.weapon.shooting = True
                     else:
                         self.weapon.shoot(game, self.transform)
+            if event.key == self.input.controls.dash:
+                self.dash()
 
         elif event.type == pygame.KEYUP:
             if event.key == self.input.controls.moveLeft:
@@ -267,6 +292,7 @@ class Player(PhysicsEntity):
                 if self.weapon:
                     if self.weapon.isAutomatic:
                         self.weapon.shooting = False
+
 
     def controller_input(self, event, game):
         if self.input.leftStick.x > 0:
@@ -289,11 +315,46 @@ class Player(PhysicsEntity):
             self.directions["down"] = False
             self.directions["up"] = False
 
+        if event.type == pygame.JOYBUTTONDOWN:
+            if event.button == self.input.controls.reload:
+                if self.weapon:
+                    if self.weapon.canReload:
+                        if self.weapon.magazine < self.weapon.maxMagazine:
+                            print("yes")
+                            self.weapon.reload()
+                            self.spinner = self.loadingSpinnerTemplate.copy()
+                            game.add_to_world(self.spinner)
+            if event.button == self.input.controls.dash:
+                self.dash()
+
+        if self.input.rightTrigger.down:
+            if self.weapon:
+                if self.weapon.isAutomatic:
+                    self.weapon.shooting = True
+                else:
+                    self.weapon.shoot(game, self.transform)
+
     def update_timers(self, dt):
         if self.currentDamageTimer < 0:
             self.canBeDamaged = True
         else:
             self.currentDamageTimer -= dt
+
+        if self.dashCooldownTimer > 0:
+            self.dashCooldownTimer -= dt
+
+    def update_spinner(self, dt):
+        self.spinner.update_animation(dt)
+        self.spinner.transform = self.transform.copy()
+        self.spinner.transform.x += 5
+        self.spinner.transform.y += -1
+
+        if self.weapon:
+            if self.weapon.isReloading:
+                self.spinner.set_action("idle")
+            else:
+                self.spinner.kill()
+                self.spinner = None
 
     def booster_particles(self):
         yellow = Particle(
@@ -303,7 +364,7 @@ class Player(PhysicsEntity):
             radius=2, 
             shrinkvel=4, 
             colour=(255, 255, 0),
-            layer=self.camLayer+2,
+            layer=self.camLayer-1,
             lighting=True,
             lightingCol=(20, 20, 0)
         )
@@ -315,7 +376,7 @@ class Player(PhysicsEntity):
             radius=3, 
             shrinkvel=4, 
             colour=(255, 100, 0),
-            layer=self.camLayer+2,
+            layer=self.camLayer-1,
             lighting=True,
             lightingCol=(25, 10, 0)
         )
@@ -327,7 +388,7 @@ class Player(PhysicsEntity):
             radius=2.5, 
             shrinkvel=2.5, 
             colour=(255, 200, 0),
-            layer=self.camLayer+2,
+            layer=self.camLayer-1,
             lighting=True,
             lightingCol=(25, 20, 0)
         )
@@ -444,17 +505,73 @@ class Player(PhysicsEntity):
                 self.explosion.kill()
                 self.explosion = None
 
+    def update_movement(self, dt):
+        if self.isDashing:
+            # During dash, move at dash speed
+            self.velocity = self.dashDirection * self.dashSpeed
+            self.dashTimer -= dt
+            if self.dashTimer <= 0:
+                self.isDashing = False
+                self.dashCooldownTimer = self.dashCooldown
+        else:
+            # Reset acceleration
+            self.acceleration.update(0, 0)
+
+            # Apply acceleration based on input directions
+            if isinstance(self.input, Controller):
+                if self.directions["right"]:
+                    self.acceleration.x += self.accelerationRate * self.input.leftStick.x
+                if self.directions["left"]:
+                    self.acceleration.x += self.accelerationRate * self.input.leftStick.x
+                if self.directions["up"]:
+                    self.acceleration.y += self.accelerationRate * self.input.leftStick.y
+                if self.directions["down"]:
+                    self.acceleration.y += self.accelerationRate * self.input.leftStick.y
+            else:
+                if self.directions["right"]:
+                    self.acceleration.x += self.accelerationRate
+                if self.directions["left"]:
+                    self.acceleration.x -= self.accelerationRate
+                if self.directions["up"]:
+                    self.acceleration.y -= self.accelerationRate
+                if self.directions["down"]:
+                    self.acceleration.y += self.accelerationRate
+
+            # Update velocity with acceleration
+            self.velocity += self.acceleration * dt
+
+            # Apply friction to simulate gradual slow down
+            self.velocity *= self.friction
+
+            # Limit the velocity to the maximum speed
+            if self.velocity.length() > self.maxSpeed:
+                self.velocity.scale_to_length(self.maxSpeed)
+
+        # Move the spaceship based on velocity
+        self.move(self.velocity, [], dt)
+
+    def calculate_dash_direction(self):
+        direction = pygame.math.Vector2()
+        if self.directions["right"]:
+            direction.x += 1
+        if self.directions["left"]:
+            direction.x -= 1
+        if self.directions["up"]:
+            direction.y -= 1
+        if self.directions["down"]:
+            direction.y += 1
+        if direction.length() == 0:
+            direction.x = 1  # default dash direction to the right if no direction is pressed
+        return direction.normalize()
+
+    def dash(self):
+        if not self.isDashing and self.dashCooldownTimer <= 0:
+            self.isDashing = True
+            self.dashTimer = self.dashDuration
+            self.dashDirection = self.calculate_dash_direction()
+
     def update(self, tiles, dt, camera: Camera, game):
-        self.movement.x = (-1 if self.directions["left"] else 1 if self.directions["right"] else 0) * self.speed
-        self.movement.y = (-1 if self.directions["up"] else 1 if self.directions["down"] else 0) * self.speed
-
-        if isinstance(self.input, Controller):
-            self.movement = self.input.leftStick.copy() * self.speed
-
-        if self.movement.length() > 0:
-            self.movement.normalize()
-
-        self.move(self.movement, tiles, dt)
+        self.update_movement(dt)
         self.update_animation(dt)
         self.update_particles(dt, camera, self.transform)
         self.check_collisions(game.ufos, game.asteroids)
@@ -465,6 +582,8 @@ class Player(PhysicsEntity):
             self.input.update()
         if self.weapon:
             self.weapon.update(game, self.get_center())
+        if self.spinner:
+            self.update_spinner(dt)
         
         #camera.draw_rect((255, 0, 0), self.rect)
 class UserCursor(Entity):
@@ -558,15 +677,20 @@ class UFO(PhysicsEntity):
         self.arrow.set_action("enter")
 
     def update_timers(self, dt):
-        if self.currentSpawnTime < 0:
-            self.arrow.set_action("exit")
+        if self.arrow:
+            if self.currentSpawnTime < 0:
+                self.arrow.set_action("exit")
 
-            if self.arrow.animation.done:
-                self.arrow.kill()
-                self.canMove = True
-        else:
-            self.arrow.set_action("idle")
-            self.currentSpawnTime -= dt
+                if self.arrow.animation.done:
+                    self.arrow.kill()
+                    self.arrow = None
+                    self.canMove = True
+                    print("hi")
+                    self.movement.x = (0 if self.canMove == False else 1 if self.directions["right"] else -1 if self.directions["left"] else 0) * self.speed
+                    self.movement.y = (0 if self.canMove == False else 1 if self.directions["down"] else -1 if self.directions["up"] else 0) * self.speed
+            else:
+                self.arrow.set_action("idle")
+                self.currentSpawnTime -= dt
 
     def ufo_rotating_animation(self, dt):
         self.rotation += self.rotationSpeed * dt * self.changeRotation
@@ -578,8 +702,6 @@ class UFO(PhysicsEntity):
             self.changeRotation = 1
 
     def movement_directions(self):
-        self.movement.x = (0 if self.canMove == False else 1 if self.directions["right"] else -1 if self.directions["left"] else 0) * self.speed
-        self.movement.y = (0 if self.canMove == False else 1 if self.directions["down"] else -1 if self.directions["up"] else 0) * self.speed
         self.rect.center = self.transform
 
     def check_bounds(self, screenSize):
@@ -596,7 +718,17 @@ class UFO(PhysicsEntity):
     def handle_collision(self, sprite):
         if sprite.tag == "spaceship":
             self.kill()
+        if sprite.tag == "asteroid":
+            if not self.entityCollisions.has(sprite):
+                self.reflect()
         super().handle_collision(sprite)
+
+    def reflect(self):
+        reflectionAngle = random.uniform(0, 2 * math.pi)
+        reflectionVector = pygame.math.Vector2(math.cos(reflectionAngle), math.sin(reflectionAngle))
+        self.movement = reflectionVector * self.speed
+        print(self.movement)
+        
 
     def update(self, dt, camera, game):
         self.update_animation(dt)
@@ -606,13 +738,14 @@ class UFO(PhysicsEntity):
         self.move(self.movement, [], dt)
         self.check_bounds(camera.screenSize)
         self.check_collisions(game.players, game.asteroids)
+        #print(self.movement)
         #camera.draw_rect((255, 0, 0), self.rect)
 
 class Asteroid(PhysicsEntity):
     def __init__(self, transform, size, tag, assets, layer=1, isScroll=True, animation="idle"):
         super().__init__(transform, size, tag, assets, layer, isScroll, animation)
         self.targetTransform = pygame.math.Vector2()
-        self.speed = 100
+        self.speed = 50
         self.localRotation = 0
         self.localRotationSpeed = 100
         self.damage = 30
@@ -639,9 +772,19 @@ class Asteroid(PhysicsEntity):
         self.calculate_rotation(camera)
         self.direction = self.calculate_direction()
 
+    def take_damage(self, damage):
+        self.health -= damage
+        if self.health <= 0:
+            self.kill()
+
     def handle_collision(self, sprite):
         if sprite.tag == "spaceship":
             self.kill()
+        if sprite.tag == "lasarbeam":
+            if not self.entityCollisions.has(sprite):
+                self.take_damage(sprite.damage)
+            self.set_action("hit")
+
         super().handle_collision(sprite)
 
     def asteroid_particles(self, center, particles):
@@ -683,6 +826,10 @@ class Asteroid(PhysicsEntity):
         self.move(self.direction, [], dt)
         self.animation.update(dt)
         self.check_collisions(game.players)
+
+        if self.action != "idle":
+            if self.animation.done:
+                self.set_action("idle")
 
 
 

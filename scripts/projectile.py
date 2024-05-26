@@ -12,6 +12,7 @@ class Weapon():
         self.reloadTime = reloadTime
         self.currentReloadTime = 0
         self.canReload = True
+        self.isReloading = False
         self.isAutomatic = isAutomatic
 
         # time between shots
@@ -29,7 +30,6 @@ class Weapon():
     def calculate_muzzle_areas(self, transform):
         muzzleTransforms = []
         for muzzle in self.muzzleAreas:
-            print(muzzle)
             muzzleTransforms.append((transform.x + muzzle[0], transform.y + muzzle[1]))
         return muzzleTransforms
     
@@ -58,6 +58,7 @@ class Weapon():
             if self.canReload == False:#
                 self.magazine = self.maxMagazine
             self.canReload = True
+            self.isReloading = False
             self.localRotation = 0
             # time between shots timer
             if self.currentShootTime <= 0 and self.currentReloadTime <=0:
@@ -71,11 +72,13 @@ class Weapon():
             self.currentReloadTime -= 1 * dt
             self.canReload = False
             self.canShoot = False
+            self.isReloading = True
 
     def update(self, game, transform):
         self.update_timers(game.dt)
         # fully automatic shooting
-        if self.shooting: self.shoot(game, transform)        
+        if self.shooting: self.shoot(game, transform)    
+        if self.magazine < self.maxMagazine: self.canReload == False    
 
 class Projectile(PhysicsEntity):
     def __init__(self, transform, size, tag, assets, layer=0, isScroll=True, animation="idle"):
@@ -109,6 +112,16 @@ class Projectile(PhysicsEntity):
             self.hit = True
             self.canDoDamage = False   
 
+    def check_bounds(self, resolution):
+        if self.transform.y <= -25:
+            self.kill()
+        if self.transform.y >= resolution[1] + 25:
+            self.kill ()
+        if self.transform.x >= resolution[0] + 25:
+            self.kill()
+        if self.transform.x <= -25:
+            self.kill()
+
     def handle_collision(self, sprite):
         if sprite.tag == "asteroid":
             self.hit_entity(sprite)
@@ -123,5 +136,6 @@ class Projectile(PhysicsEntity):
         self.move(self.movement * self.speed, [], dt)
         self.check_collisions(game.asteroids, game.ufos)
         self.check_finished()
+        self.check_bounds(game.window.world.screenSize)
         self.particles.update(dt, self.transform)
         self.particles.draw(game.window.world)

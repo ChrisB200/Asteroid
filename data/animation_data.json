@@ -24,5 +24,13 @@
   "lasarbeam/idle": {
     "img_dur": 0.1,
     "loop": true
+  },
+  "spinner/idle": {
+    "img_dur": 0.08,
+    "loop": true
+  },
+  "asteroid/hit": {
+    "img_dur": 0.05,
+    "loop": false
   }
 }
