@@ -154,7 +154,8 @@ class Camera(pygame.sprite.Group):
                     case "circle":
                         pygame.draw.circle(self.screen, item[1], item[2] - self.scroll, item[3], item[4])
             else:
-                self.calculate_scroll(item)
+                if item.hide != True:
+                    self.calculate_scroll(item)
 
         # Clear the queue after processing
         self.queue.clear()

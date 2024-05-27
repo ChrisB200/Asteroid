@@ -11,7 +11,8 @@ from scripts.entities import Player, ModifiedSpriteGroup, UFO, Background, Aster
 from scripts.animation import load_animations
 from scripts.input import Controller, Keyboard, controller_check
 from scripts.constants import BASE_IMG_PATH
-from scripts.projectile import Weapon, Projectile
+from scripts.projectile import Weapon, Projectile, Missile, PiercingProjectile
+from scripts.particles import Particle, ParticleSystem
 
 # configure the logger
 logging.basicConfig(
@@ -57,6 +58,14 @@ class Game():
         self.DEFAULT_PROJECTILE = Projectile((0, 0), (13, 13), "lasarbeam", self.assets, layer=5)
         self.DEFAULT_WEAPON = Weapon(50, 1, True, 0.1, self.DEFAULT_PROJECTILE, [[3, -5], [-16, -5]])
 
+        self.MISSILE = Missile((0, 0), (11, 31), "missile", self.assets)
+        self.MISSILE_WEAPON = Weapon(5, 2, False, 0.7, self.MISSILE, [[7, 0]])
+
+        self.PIERCING_PROJECTILE = PiercingProjectile((0, 0), (13, 13), "piercing", self.assets, layer=5)
+        self.PIERCING_WEAPON = Weapon(50, 0.5, True, 0.1, self.PIERCING_PROJECTILE, [[3, -5], [-16, -5]])
+
+        self.particles = ParticleSystem((0, 0))
+
     def add_to_world(self, *sprites):
         self.window.world.add(*sprites)
 
@@ -67,7 +76,7 @@ class Game():
 
         try:
             joysticks = controller_check()
-            for joystick in joysticks:
+            for joystick in joysticks: 
                 controller = Controller(self.settings.controller, joystick)
                 self.inputDevices.append(controller) 
                 logger.info("Detected controller, name: %s, guid: %s", controller.name, controller.guid)
@@ -81,10 +90,11 @@ class Game():
         player = Player(numOfPlayers, pos, (26, 17), "spaceship", self.assets, layer)
 
         input = self.inputDevices[input]
-        weapon = self.DEFAULT_WEAPON.copy()
+        weapons = [self.DEFAULT_WEAPON.copy(), self.MISSILE_WEAPON.copy(), self.PIERCING_WEAPON.copy()]
 
         player.input = input
-        player.weapon = weapon
+        player.weapons = weapons
+        player.weapon = player.weapons[0]
 
         self.players.add(player)
         self.add_to_world(player)
@@ -94,6 +104,7 @@ class Game():
 
     # draws the window
     def draw(self):
+        self.particles.draw(self.window.world)
         self.window.world.draw_scrolling_background(self.background, self.bgScroll)
         self.window.draw_world()
         self.window.draw_foreground()
@@ -114,7 +125,7 @@ class Game():
             player.update([], self.dt, self.window.world, self)
         
         for projectile in self.projectiles:
-            projectile.update(self.dt, self)
+            projectile.update(self.dt, self, self.particles)
 
         for ufo in self.ufos:
             ufo.update(self.dt, self.window.world, self)
@@ -125,12 +136,14 @@ class Game():
         for asteroid in self.asteroids:
             asteroid.update(self.dt, self)
 
+        self.particles.update(self.dt, (0, 0))
+
     def event_handler(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.state = "" 
             if event.type == pygame.KEYDOWN:
-                if event.key == K_SPACE:
+                if event.key == K_e:
                     ufo = UFO((0, 0), (24, 19), "ufo", self.assets)
                     ufo.spawn(self.window.world.screenSize)
                     self.ufos.add(ufo)

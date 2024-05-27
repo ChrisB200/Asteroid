@@ -21,6 +21,7 @@ class Controls:
     pause: int
     shoot: int
     reload: int
+    swapWeapon: int
 
 class Trigger:
     def __init__(self, axis):

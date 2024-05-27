@@ -1,4 +1,5 @@
 import pygame
+import random
 from pygame.constants import *
 
 from scripts.entities import PhysicsEntity
@@ -131,7 +132,7 @@ class Projectile(PhysicsEntity):
 
         super().handle_collision(sprite)
 
-    def update(self, dt, game):
+    def update(self, dt, game, particles):
         self.update_animation(dt)
         self.move(self.movement * self.speed, [], dt)
         self.check_collisions(game.asteroids, game.ufos)
@@ -139,3 +140,124 @@ class Projectile(PhysicsEntity):
         self.check_bounds(game.window.world.screenSize)
         self.particles.update(dt, self.transform)
         self.particles.draw(game.window.world)
+
+class Missile(Projectile):
+    def __init__(self, transform, size, tag, assets, layer=0, isScroll=True, animation="idle"):
+        super().__init__(transform, size, tag, assets, layer, isScroll, animation)
+        self.damage = 50
+        self.particleOffset = pygame.math.Vector2(6, 10)
+        self.set_rotation(0)
+        self.explosionTimer = 0.5
+        self.currentExplosionTimer = 0
+
+    def hit_entity(self, sprite):
+        if self.canDoDamage:
+            self.movement.y = 0
+            self.currentExplosionTimer = self.explosionTimer
+            self.hit = True
+            self.canDoDamage = False
+            self.hide = True
+    
+    def update_timers(self, dt, particles):
+        if self.currentExplosionTimer < 0 and self.canDoDamage == False:
+            self.kill()
+        if self.currentExplosionTimer > 0 and self.canDoDamage == False:
+            self.currentExplosionTimer -= 1 * dt
+            self.explosion_particles(particles)
+
+    def explosion_particles(self, particles):
+        speedMultiplier = 1.5
+
+        white = Particle(
+            transform=self.get_center(), 
+            velocity=(random.randint(-150, 150) / speedMultiplier, random.randint(-150, 150) / speedMultiplier),
+            timer = 2,
+            radius=6, 
+            shrinkvel=7, 
+            colour=(255, 255, 255),
+            layer=self.camLayer+2,
+            lighting=True,
+            lightingCol=(50, 50, 50)
+        )
+
+        red = Particle(
+            transform=self.get_center(), 
+            velocity=(random.randint(-150, 150) / speedMultiplier, random.randint(-150, 150) / speedMultiplier),
+            timer = 2,
+            radius=6, 
+            shrinkvel=9, 
+            colour=(255, 20, 0),
+            layer=self.camLayer+2,
+            lighting=True,
+            lightingCol=(25, 10, 0)
+        )
+
+        orange = Particle(
+            transform=self.get_center(), 
+            velocity=(random.randint(-150, 150) / speedMultiplier, random.randint(-150, 150) / speedMultiplier),
+            timer = 2,
+            radius=6, 
+            shrinkvel=8, 
+            colour=(255, 100, 0),
+            layer=self.camLayer+2,
+            lighting=True,
+            lightingCol=(25, 30, 0)
+        )
+
+        particles.add(white, red, orange)
+
+    def booster_particles(self, particles):
+        yellow = Particle(
+            transform=self.particles.transform + self.particleOffset, 
+            velocity=(random.randint(-150, 150) / 10, 40),
+            timer = 2,
+            radius=2, 
+            shrinkvel=4, 
+            colour=(255, 255, 0),
+            layer=self.camLayer-1,
+            lighting=True,
+            lightingCol=(20, 20, 0)
+        )
+
+        red = Particle(
+            transform=self.particles.transform + self.particleOffset, 
+            velocity=(random.randint(-150, 150) / 10, 40),
+            timer = 2,
+            radius=3, 
+            shrinkvel=4, 
+            colour=(255, 100, 0),
+            layer=self.camLayer-1,
+            lighting=True,
+            lightingCol=(25, 10, 0)
+        )
+
+        orange = Particle(
+            transform=self.particles.transform + self.particleOffset, 
+            velocity=(random.randint(-150, 150) / 10, 40),
+            timer = 2,
+            radius=2.5, 
+            shrinkvel=2.5, 
+            colour=(255, 200, 0),
+            layer=self.camLayer-1,
+            lighting=True,
+            lightingCol=(25, 20, 0)
+        )
+        
+        particles.add(yellow, red, orange)
+
+    def update(self, dt, game, particles):
+        super().update(dt, game, particles)
+        self.booster_particles(particles)
+        self.update_timers(dt, particles)
+
+class PiercingProjectile(Projectile):
+    def __init__(self, transform, size, tag, assets, layer=0, isScroll=True, animation="idle"):
+        super().__init__(transform, size, tag, assets, layer, isScroll, animation)
+        self.speed = 400
+        self.damage = 15
+
+    def check_finished(self):
+        pass
+
+    def hit_entity(self, sprite):
+        pass

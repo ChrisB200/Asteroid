@@ -68,6 +68,7 @@ class Entity(pygame.sprite.Sprite):
         self.movement = pygame.math.Vector2()
         self.speed = 100
         self.canRemove = False
+        self.hide = False
         
         # animation
         self.action: str = ""
@@ -217,6 +218,7 @@ class Player(PhysicsEntity):
         self.id = id
         self.speed = 150
         self.health = 200
+        self.weapons = []
         self.weapon = None
         self.input = None
         self.canBeDamaged = True
@@ -278,6 +280,8 @@ class Player(PhysicsEntity):
                         self.weapon.shoot(game, self.transform)
             if event.key == self.input.controls.dash:
                 self.dash()
+            if event.key == self.input.controls.swapWeapon:
+                self.swap_weapon(+1)
 
         elif event.type == pygame.KEYUP:
             if event.key == self.input.controls.moveLeft:
@@ -333,6 +337,10 @@ class Player(PhysicsEntity):
                     self.weapon.shooting = True
                 else:
                     self.weapon.shoot(game, self.transform)
+        if self.input.rightTrigger.up:
+            if self.weapon:
+                if self.weapon.isAutomatic:
+                    self.weapon.shooting = False
 
     def update_timers(self, dt):
         if self.currentDamageTimer < 0:
@@ -470,6 +478,51 @@ class Player(PhysicsEntity):
         )
 
         self.particles.add(white, red, orange)
+
+    def dash_particles(self):
+        speedMultiplier = 5
+
+        white = Particle(
+            transform=self.get_center(), 
+            velocity=(random.randint(-150, 150) / speedMultiplier, random.randint(-150, 150) / speedMultiplier),
+            timer = 2,
+            radius=6, 
+            shrinkvel=9, 
+            colour=(255, 255, 255),
+            layer=self.camLayer-1,
+        )
+
+        grey = Particle(
+            transform=self.get_center(), 
+            velocity=(random.randint(-150, 150) / speedMultiplier, random.randint(-150, 150) / speedMultiplier),
+            timer = 2,
+            radius=6, 
+            shrinkvel=11, 
+            colour=(150, 150, 150),
+            layer=self.camLayer-1,
+        )
+
+        darkGrey = Particle(
+            transform=self.get_center(), 
+            velocity=(random.randint(-150, 150) / speedMultiplier, random.randint(-150, 150) / speedMultiplier),
+            timer = 2,
+            radius=6, 
+            shrinkvel=10, 
+            colour=(100, 100, 100),
+            layer=self.camLayer-1,
+        )
+
+        self.particles.add(white, grey, darkGrey)
+
+    def check_bounds(self, screenSize):
+        if self.transform.x > screenSize[0]:
+            self.transform.x = screenSize[0]
+        if self.transform.x < 0:
+            self.transform.x = 0
+        if self.transform.y > screenSize[1]:
+            self.transform.y = screenSize[1]
+        if self.transform.y < 0:
+            self.transform.y = 0
     
     def update_particles(self, dt, camera, transform=None):
         self.booster_particles()
@@ -510,6 +563,7 @@ class Player(PhysicsEntity):
             # During dash, move at dash speed
             self.velocity = self.dashDirection * self.dashSpeed
             self.dashTimer -= dt
+            self.dash_particles()
             if self.dashTimer <= 0:
                 self.isDashing = False
                 self.dashCooldownTimer = self.dashCooldown
@@ -550,6 +604,20 @@ class Player(PhysicsEntity):
         # Move the spaceship based on velocity
         self.move(self.velocity, [], dt)
 
+    def swap_weapon(self, amount):
+        if not self.weapon.isReloading:
+            index = 0
+            self.weapon.shooting = False
+            for i in range(len(self.weapons)):
+                if self.weapon == self.weapons[i]:
+                    index = i
+            if amount + index < len(self.weapons):
+                self.weapon = self.weapons[amount + index]
+            elif amount + index >= len(self.weapons):
+                self.weapon = self.weapons[0]
+            elif amount + index < 0 :
+                self.weapon = self.weapons[-1]
+
     def calculate_dash_direction(self):
         direction = pygame.math.Vector2()
         if self.directions["right"]:
@@ -577,6 +645,7 @@ class Player(PhysicsEntity):
         self.check_collisions(game.ufos, game.asteroids)
         self.handle_explosion(game)
         self.update_timers(dt)
+        self.check_bounds(game.window.world.screenSize)
 
         if self.input:
             self.input.update()
@@ -642,14 +711,14 @@ class UFO(PhysicsEntity):
         offset = pygame.math.Vector2(25, 10)
         match border:
             case 1: # left
-                amount = random.randint(100, screenSize[1] - 20)
+                amount = random.randint(50, screenSize[1] - 20)
                 self.transform.x = -self.width
                 self.transform.y = amount
                 self.arrow.set_transform((offset.x - (self.arrow.width//2), amount - offset.y))
                 self.arrow.set_rotation(0)
                 direction = "right"
             case 2: # right
-                amount = random.randint(100, screenSize[1] - 20)
+                amount = random.randint(50, screenSize[1] - 20)
                 self.transform.x = screenSize[0] + self.width
                 self.transform.y = amount
                 self.arrow.set_transform((screenSize[0] - offset.x - (self.arrow.width//2), amount - offset.y))
@@ -780,7 +849,7 @@ class Asteroid(PhysicsEntity):
     def handle_collision(self, sprite):
         if sprite.tag == "spaceship":
             self.kill()
-        if sprite.tag == "lasarbeam":
+        if sprite.tag in ["lasarbeam", "missile", "piercing"]:
             if not self.entityCollisions.has(sprite):
                 self.take_damage(sprite.damage)
             self.set_action("hit")
@@ -821,11 +890,22 @@ class Asteroid(PhysicsEntity):
         )
         
         particles.add(brown, darkbrown, black)
+
+    def check_bounds(self, screenSize):
+        if self.transform.x < -100:
+            self.kill()
+        if self.transform.x > screenSize[0] + 100:
+            self.kill()
+        if self.transform.y < -400:
+            self.kill()
+        if self.transform.y > screenSize[1]:
+            self.kill()
         
     def update(self, dt, game):    
         self.move(self.direction, [], dt)
         self.animation.update(dt)
         self.check_collisions(game.players)
+        self.check_bounds(game.window.world.screenSize)
 
         if self.action != "idle":
             if self.animation.done:
