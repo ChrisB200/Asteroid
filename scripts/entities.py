@@ -746,6 +746,7 @@ class UFO(PhysicsEntity):
         self.directions[direction] = True
         self.arrow.set_action("enter")
         self.spawned = True
+        print("dom dom yes yes")
 
     def update_timers(self, dt):
         if self.arrow:

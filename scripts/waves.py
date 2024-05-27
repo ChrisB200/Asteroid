@@ -57,7 +57,8 @@ class Wave:
             if not ufo.spawned and not stop:
                 ufo.spawn(game.get_world_size())
                 game.ufos.add(ufo)
-                game.add_to_world(ufo)
+                game.arrows.add(ufo.arrow)
+                game.add_to_world(ufo, ufo.arrow)
                 pygame.time.set_timer(SPAWN_UFO, random.randrange(500, 2000))
                 stop = True
 
