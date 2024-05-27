@@ -144,7 +144,7 @@ class Projectile(PhysicsEntity):
 class Missile(Projectile):
     def __init__(self, transform, size, tag, assets, layer=0, isScroll=True, animation="idle"):
         super().__init__(transform, size, tag, assets, layer, isScroll, animation)
-        self.damage = 50
+        self.damage = 20
         self.particleOffset = pygame.math.Vector2(6, 10)
         self.set_rotation(0)
         self.explosionTimer = 0.5
@@ -159,9 +159,9 @@ class Missile(Projectile):
             self.hide = True
     
     def update_timers(self, dt, particles):
-        if self.currentExplosionTimer < 0 and self.canDoDamage == False:
+        if self.currentExplosionTimer < 0 and self.hit == True:
             self.kill()
-        if self.currentExplosionTimer > 0 and self.canDoDamage == False:
+        if self.currentExplosionTimer > 0 and self.hit == True:
             self.currentExplosionTimer -= 1 * dt
             self.explosion_particles(particles)
 

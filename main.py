@@ -14,6 +14,7 @@ from scripts.constants import BASE_IMG_PATH
 from scripts.projectile import Weapon, Projectile, Missile, PiercingProjectile
 from scripts.particles import Particle, ParticleSystem
 from scripts.waves import WaveSystem
+from scripts.menu import UserInterface, AnimatedElement, TextElement
 
 # configure the logger
 logging.basicConfig(
@@ -69,6 +70,17 @@ class Game():
 
         self.particles = ParticleSystem((0, 0))
 
+        self.ui = UserInterface(self.get_world_size())
+        self.heart = AnimatedElement((20, 20), (11, 11), "heart", self.assets)
+        self.font = pygame.font.Font("data/fonts/retro-gaming.ttf", 12)
+        self.healthText = TextElement((40, 20), "100", self.font)
+        self.ammoType = AnimatedElement((20, 40), (20, 20), "lasarbeam", self.assets)
+        self.ammoType.rotation = -90
+        self.ammoText = TextElement((40, 40), f"{self.DEFAULT_WEAPON.magazine} / {self.DEFAULT_WEAPON.maxMagazine}", self.font)
+        self.ui.add(self.heart, self.healthText, self.ammoType, self.ammoText)
+
+        self.window.ui = self.ui
+
     def add_to_world(self, *sprites):
         self.window.world.add(*sprites)
 
@@ -114,6 +126,7 @@ class Game():
         self.window.world.draw_scrolling_background(self.background, self.bgScroll)
         self.window.draw_world()
         self.window.draw_foreground()
+        self.window.draw_ui()
         self.window.draw()
         pygame.display.flip()
 
@@ -129,6 +142,12 @@ class Game():
         player: Player
         for player in self.players:
             player.update([], self.dt, self.window.world, self)
+
+            weapon = player.weapon
+            self.healthText.change_text(str(player.health))
+            self.ammoText.change_text(f"{weapon.magazine} / {weapon.maxMagazine}")
+            self.ammoType.change_tag(weapon.bullet.tag)
+            self.ammoType.rotation = weapon.bullet.rotation
         
         for projectile in self.projectiles:
             projectile.update(self.dt, self, self.particles)
@@ -144,6 +163,7 @@ class Game():
 
         self.particles.update(self.dt, (0, 0))
         self.waveSystem.update()
+        self.ui.update(self.dt)
 
     def event_handler(self):
         for event in pygame.event.get():
@@ -157,6 +177,7 @@ class Game():
 
     def run(self):
         self.detect_inputs()
+        print(self.get_world_size())
         self.create_player((200, 20), 0, layer=2)
 
         while self.state == "running":

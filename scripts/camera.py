@@ -5,7 +5,7 @@ from pygame.constants import *
 import logging
 
 # Scripts
-from scripts.menu import UserInterface, Menu, Element
+
 
 logger = logging.getLogger(__name__)
     
@@ -19,7 +19,7 @@ class Window():
 
         self.world = Camera(self.resolution, 3, (0, 0), minScale=1, maxScale=1, panStrength=10)
         self.foreground = Camera(self.resolution, 1)
-        self.ui = UserInterface(self.resolution)
+        self.ui = None
 
         self.screenShake = 0
     
@@ -54,7 +54,8 @@ class Window():
         self.display.fill((0, 0, 0))
         self.display.blit(pygame.transform.scale(self.worldScreen, (self.resolution[0] + 20, self.resolution[1] + 20)), (screenShakeOffset.x - 10 - self.world.scrollDiff.x, screenShakeOffset.y - 10 - self.world.scrollDiff.y))
         self.display.blit(self.foregroundScreen, (0, 0))
-        self.display.blit(self.ui.screen, (0, 0))
+        if self.ui:
+            self.display.blit(pygame.transform.scale(self.ui.surface, self.resolution), (0, 0))
 
 class Camera(pygame.sprite.Group):
     def __init__(self, resolution, scale, offset=(0, 0), panStrength=20, minScale=1, maxScale=1, zoomSpeed=1):
