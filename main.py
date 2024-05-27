@@ -13,6 +13,7 @@ from scripts.input import Controller, Keyboard, controller_check
 from scripts.constants import BASE_IMG_PATH
 from scripts.projectile import Weapon, Projectile, Missile, PiercingProjectile
 from scripts.particles import Particle, ParticleSystem
+from scripts.waves import WaveSystem
 
 # configure the logger
 logging.basicConfig(
@@ -55,6 +56,8 @@ class Game():
         self.background = Background((0, 0), self.bgImage, -10)
         self.bgScroll = 1
 
+        self.waveSystem = WaveSystem(self)
+
         self.DEFAULT_PROJECTILE = Projectile((0, 0), (13, 13), "lasarbeam", self.assets, layer=5)
         self.DEFAULT_WEAPON = Weapon(50, 1, True, 0.1, self.DEFAULT_PROJECTILE, [[3, -5], [-16, -5]])
 
@@ -68,6 +71,9 @@ class Game():
 
     def add_to_world(self, *sprites):
         self.window.world.add(*sprites)
+
+    def get_world_size(self):
+        return self.window.world.screenSize
 
     # detects input devices and appends them
     def detect_inputs(self):
@@ -137,26 +143,17 @@ class Game():
             asteroid.update(self.dt, self)
 
         self.particles.update(self.dt, (0, 0))
+        self.waveSystem.update()
 
     def event_handler(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.state = "" 
-            if event.type == pygame.KEYDOWN:
-                if event.key == K_e:
-                    ufo = UFO((0, 0), (24, 19), "ufo", self.assets)
-                    ufo.spawn(self.window.world.screenSize)
-                    self.ufos.add(ufo)
-                    self.arrows.add(ufo.arrow)
-                    self.add_to_world(ufo, ufo.arrow)
-                if event.key == pygame.K_q:
-                    asteroid = Asteroid((0, 0), (40, 38), "asteroid", self.assets)
-                    asteroid.spawn(self.window.world.screenSize[0], self.window.world.screenSize[1], self.window.world)
-                    self.asteroids.add(asteroid)
-                    self.add_to_world(asteroid)
-
+        
             for player in self.players:
                 player.event_handler(event, self)
+            
+            self.waveSystem.event_handler(event)
 
     def run(self):
         self.detect_inputs()

@@ -705,6 +705,7 @@ class UFO(PhysicsEntity):
         self.currentSpawnTime = self.spawnTime
         self.canMove = False
         self.damage = 20
+        self.spawned = False
 
     def spawn(self, screenSize):
         border = random.randint(1, 2)
@@ -744,6 +745,7 @@ class UFO(PhysicsEntity):
 
         self.directions[direction] = True
         self.arrow.set_action("enter")
+        self.spawned = True
 
     def update_timers(self, dt):
         if self.arrow:
@@ -819,6 +821,8 @@ class Asteroid(PhysicsEntity):
         self.localRotationSpeed = 100
         self.damage = 30
         self.health = 100
+        self.spawned = False
+        self.direction = pygame.math.Vector2(0, 0)
 
     @property
     def image(self):
@@ -834,12 +838,13 @@ class Asteroid(PhysicsEntity):
     def calculate_rotation(self, camera):
         self.rotation = self.get_point_angle(self.targetTransform, camera.scroll)
 
-    def spawn(self, width, height, camera):
-        self.set_transform((random.randint(0, width), -60))
-        self.targetTransform.x = random.randint(0, width)
-        self.targetTransform.y = height + 60
+    def spawn(self, size, camera):
+        self.set_transform((random.randint(0, size[0]), -60))
+        self.targetTransform.x = random.randint(0, size[0])
+        self.targetTransform.y = size[1] + 60
         self.calculate_rotation(camera)
         self.direction = self.calculate_direction()
+        self.spawned = True
 
     def take_damage(self, damage):
         self.health -= damage
