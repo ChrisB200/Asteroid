@@ -11,7 +11,7 @@ from scripts.entities import Player, ModifiedSpriteGroup, UFO, Background, Aster
 from scripts.animation import load_animations
 from scripts.input import Controller, Keyboard, controller_check
 from scripts.constants import BASE_IMG_PATH
-from scripts.projectile import Weapon, Projectile, Missile, PiercingProjectile
+from scripts.projectile import *
 from scripts.particles import Particle, ParticleSystem
 from scripts.waves import WaveSystem
 from scripts.menu import UserInterface, AnimatedElement, TextElement
@@ -68,6 +68,9 @@ class Game():
         self.PIERCING_PROJECTILE = PiercingProjectile((0, 0), (13, 13), "piercing", self.assets, layer=5)
         self.PIERCING_WEAPON = Weapon(50, 0.5, True, 0.1, self.PIERCING_PROJECTILE, [[3, -5], [-16, -5]])
 
+        self.SPREADING_PROJECTILE = Projectile((0, 0), (13, 13), "spread", self.assets, layer=5)
+        self.SPREADING_WEAPON = SpreadWeapon(50, 1, True, 0.1, self.SPREADING_PROJECTILE, [[3, -5], [7, 0]])
+        
         self.particles = ParticleSystem((0, 0))
 
         self.ui = UserInterface(self.get_world_size())
@@ -97,7 +100,7 @@ class Game():
             joysticks = controller_check()
             for joystick in joysticks: 
                 controller = Controller(self.settings.controller, joystick)
-                self.inputDevices.append(controller) 
+                self.inputDevices.append(controller)
                 logger.info("Detected controller, name: %s, guid: %s", controller.name, controller.guid)
         except:
             logger.info("No controllers detected")
@@ -109,7 +112,7 @@ class Game():
         player = Player(numOfPlayers, pos, (26, 17), "spaceship", self.assets, layer)
 
         input = self.inputDevices[input]
-        weapons = [self.DEFAULT_WEAPON.copy(), self.MISSILE_WEAPON.copy(), self.PIERCING_WEAPON.copy()]
+        weapons = [self.DEFAULT_WEAPON.copy(), self.MISSILE_WEAPON.copy(), self.PIERCING_WEAPON.copy(), self.SPREADING_WEAPON.copy()]
 
         player.input = input
         player.weapons = weapons

@@ -263,3 +263,36 @@ class PiercingProjectile(Projectile):
 
     def hit_entity(self, sprite):
         pass
+
+class SpreadProjectile(Projectile):
+    def __init__(self, transform, size, tag, assets, layer=0, isScroll=True, animation="idle"):
+        super().__init__(transform, size, tag, assets, layer, isScroll, animation)
+        self.set_rotation(0)
+
+    def hit_entity(self, sprite):
+        if self.canDoDamage:
+            self.movement.y = 0
+            self.hit = True
+            self.canDoDamage = False 
+
+class SpreadWeapon(Weapon):
+    def __init__(self, maxMagazine, reloadTime, isAutomatic, shootTime, bullet, muzzleAreas):
+        super().__init__(maxMagazine, reloadTime, isAutomatic, shootTime, bullet, muzzleAreas)
+        self.numBullets = 8
+        self.spread = 10
+
+    def shoot(self, game, transform):
+        if self.canShoot and self.magazine > 0:
+            muzzleTransforms = self.calculate_muzzle_areas(transform)
+            for muzzle in muzzleTransforms:
+                for bullet in range(self.numBullets):
+                    # create bullet at muzzle transform
+                    bullet = self.bullet.copy()
+                    bullet.start(muzzle)
+                    # add to world and camera
+                    game.projectiles.add(bullet)
+                    game.add_to_world(bullet)
+
+            # start timer
+            self.currentShootTime = self.shootTime
+            self.magazine -= 1
