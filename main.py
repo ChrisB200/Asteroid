@@ -76,8 +76,9 @@ class Game():
         self.healthText = TextElement((40, 20), "100", self.font)
         self.ammoType = AnimatedElement((20, 40), (20, 20), "lasarbeam", self.assets)
         self.ammoType.rotation = -90
+        self.waveNumberText = TextElement((10, self.get_world_size()[1] - 20), "1", self.font)
         self.ammoText = TextElement((40, 40), f"{self.DEFAULT_WEAPON.magazine} / {self.DEFAULT_WEAPON.maxMagazine}", self.font)
-        self.ui.add(self.heart, self.healthText, self.ammoType, self.ammoText)
+        self.ui.add(self.heart, self.healthText, self.ammoType, self.ammoText, self.waveNumberText)
 
         self.window.ui = self.ui
 
@@ -162,7 +163,7 @@ class Game():
             asteroid.update(self.dt, self)
 
         self.particles.update(self.dt, (0, 0))
-        self.waveSystem.update()
+        self.waveSystem.update(self.waveNumberText)
         self.ui.update(self.dt)
 
     def event_handler(self):

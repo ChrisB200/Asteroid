@@ -85,7 +85,7 @@ class Wave:
 
 class WaveSystem:
     def __init__(self, game):
-        self.waveNumber = 1
+        self.waveNumber = 0
         self.wave = Wave(self.waveNumber, 20, 8)
         self.game = game
 
@@ -93,10 +93,11 @@ class WaveSystem:
         wave_calculation = int(0.5 * (self.waveNumber + 4)**2 + 0.5 * (self.waveNumber + 4))
         return random.randint(wave_calculation, wave_calculation + 2)
 
-    def update(self):
+    def update(self, waveNumberText):
         self.wave.update()
         if self.wave.end:
             self.waveNumber += 1
+            waveNumberText.change_text(str(self.waveNumber))
             self.wave = Wave(self.waveNumber, self.calculate_max_enemies(), self.calculate_max_enemies())
             print("ended")
             self.wave.start_wave(self.game)

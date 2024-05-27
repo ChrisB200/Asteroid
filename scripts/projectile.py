@@ -257,7 +257,9 @@ class PiercingProjectile(Projectile):
         self.damage = 15
 
     def check_finished(self):
-        pass
+        for entity in self.entityCollisions:
+            if entity.tag == "asteroid":
+                self.asteroid.asteroid_particles(self.transform, self.particles)
 
     def hit_entity(self, sprite):
         pass
