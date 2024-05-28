@@ -268,31 +268,68 @@ class SpreadProjectile(Projectile):
     def __init__(self, transform, size, tag, assets, layer=0, isScroll=True, animation="idle"):
         super().__init__(transform, size, tag, assets, layer, isScroll, animation)
         self.set_rotation(0)
+        self.damage = 5
+        self.maxAlive = 0.3
+        self.currentAlive = 0
+        self.hasSpawned = False
 
     def hit_entity(self, sprite):
         if self.canDoDamage:
             self.movement.y = 0
             self.hit = True
-            self.canDoDamage = False 
+            self.canDoDamage = False
+
+    def check_finished(self):
+        if self.hit:
+            self.kill()
+        if self.asteroid:
+            self.asteroid.asteroid_particles(self.transform, self.particles)
+
+    def update_timers(self, dt):
+        if self.hasSpawned and self.currentAlive > 0:
+            self.currentAlive -= dt
+        elif self.hasSpawned and self.currentAlive <= 0:
+            self.kill()
+
+    def update(self, dt, game, particles):
+        super().update(dt, game, particles)
+        self.update_timers(dt)
+
+    def start(self, transform):
+        super().start(transform)
+        self.currentAlive = self.maxAlive
+        self.hasSpawned = True
 
 class SpreadWeapon(Weapon):
     def __init__(self, maxMagazine, reloadTime, isAutomatic, shootTime, bullet, muzzleAreas):
         super().__init__(maxMagazine, reloadTime, isAutomatic, shootTime, bullet, muzzleAreas)
         self.numBullets = 8
-        self.spread = 10
+        self.spread = 40
 
     def shoot(self, game, transform):
         if self.canShoot and self.magazine > 0:
             muzzleTransforms = self.calculate_muzzle_areas(transform)
             for muzzle in muzzleTransforms:
-                for bullet in range(self.numBullets):
-                    # create bullet at muzzle transform
+                for i in range(self.numBullets):
+                    # Calculate random spread angle
+                    angle = random.uniform(-self.spread / 2, self.spread / 2)
+                    
+                    # Create bullet at muzzle transform
                     bullet = self.bullet.copy()
                     bullet.start(muzzle)
-                    # add to world and camera
+                    
+                    # Adjust bullet direction based on spread angle
+                    bullet_direction = pygame.math.Vector2(0, -1).rotate(angle)
+                    bullet.movement = bullet_direction
+                    
+                    # Add to world and camera
                     game.projectiles.add(bullet)
                     game.add_to_world(bullet)
 
-            # start timer
+            # Start timer
             self.currentShootTime = self.shootTime
             self.magazine -= 1
+
+    
+
+    

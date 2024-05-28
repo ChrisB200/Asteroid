@@ -855,7 +855,7 @@ class Asteroid(PhysicsEntity):
     def handle_collision(self, sprite):
         if sprite.tag == "spaceship":
             self.kill()
-        if sprite.tag in ["lasarbeam", "piercing"]:
+        if sprite.tag in ["lasarbeam", "piercing", "spread"]:
             if not self.entityCollisions.has(sprite):
                 self.take_damage(sprite.damage)
             self.set_action("hit")

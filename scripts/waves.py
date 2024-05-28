@@ -59,7 +59,7 @@ class Wave:
                 game.ufos.add(ufo)
                 game.arrows.add(ufo.arrow)
                 game.add_to_world(ufo, ufo.arrow)
-                pygame.time.set_timer(SPAWN_UFO, random.randrange(500, 2000))
+                pygame.time.set_timer(SPAWN_UFO, random.randrange(500 - (self.number * 2), 2000 - (self.number * 2)))
                 stop = True
 
     def event_handler(self, event, game):

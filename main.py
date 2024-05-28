@@ -59,17 +59,17 @@ class Game():
 
         self.waveSystem = WaveSystem(self)
 
-        self.DEFAULT_PROJECTILE = Projectile((0, 0), (13, 13), "lasarbeam", self.assets, layer=5)
+        self.DEFAULT_PROJECTILE = Projectile((0, 0), (13, 13), "lasarbeam", self.assets, layer=0)
         self.DEFAULT_WEAPON = Weapon(50, 1, True, 0.1, self.DEFAULT_PROJECTILE, [[3, -5], [-16, -5]])
 
         self.MISSILE = Missile((0, 0), (11, 31), "missile", self.assets)
         self.MISSILE_WEAPON = Weapon(5, 2, False, 0.7, self.MISSILE, [[7, 0]])
 
-        self.PIERCING_PROJECTILE = PiercingProjectile((0, 0), (13, 13), "piercing", self.assets, layer=5)
-        self.PIERCING_WEAPON = Weapon(50, 0.5, True, 0.1, self.PIERCING_PROJECTILE, [[3, -5], [-16, -5]])
+        self.PIERCING_PROJECTILE = PiercingProjectile((0, 0), (13, 13), "piercing", self.assets, layer=0)
+        self.PIERCING_WEAPON = Weapon(75, 0.5, True, 0.1, self.PIERCING_PROJECTILE, [[3, -5], [-16, -5]])
 
-        self.SPREADING_PROJECTILE = Projectile((0, 0), (13, 13), "spread", self.assets, layer=5)
-        self.SPREADING_WEAPON = SpreadWeapon(50, 1, True, 0.1, self.SPREADING_PROJECTILE, [[3, -5], [7, 0]])
+        self.SPREADING_PROJECTILE = SpreadProjectile((0, 0), (13, 13), "spread", self.assets, layer=0)
+        self.SPREADING_WEAPON = SpreadWeapon(25, 0.7, True, 0.05, self.SPREADING_PROJECTILE, [[-3, 0]])
         
         self.particles = ParticleSystem((0, 0))
 
@@ -77,7 +77,7 @@ class Game():
         self.heart = AnimatedElement((20, 20), (11, 11), "heart", self.assets)
         self.font = pygame.font.Font("data/fonts/retro-gaming.ttf", 12)
         self.healthText = TextElement((40, 20), "100", self.font)
-        self.ammoType = AnimatedElement((20, 40), (20, 20), "lasarbeam", self.assets)
+        self.ammoType = AnimatedElement((17.5, 40), (15, 15), "lasarbeam", self.assets)
         self.ammoType.rotation = -90
         self.waveNumberText = TextElement((10, self.get_world_size()[1] - 20), "1", self.font)
         self.ammoText = TextElement((40, 40), f"{self.DEFAULT_WEAPON.magazine} / {self.DEFAULT_WEAPON.maxMagazine}", self.font)
@@ -152,6 +152,10 @@ class Game():
             self.ammoText.change_text(f"{weapon.magazine} / {weapon.maxMagazine}")
             self.ammoType.change_tag(weapon.bullet.tag)
             self.ammoType.rotation = weapon.bullet.rotation
+            if weapon.magazine == 0:
+                self.ammoText.change_colour((180, 0, 0))
+            else:
+                self.ammoText.change_colour((255, 255, 255))
         
         for projectile in self.projectiles:
             projectile.update(self.dt, self, self.particles)

@@ -19,6 +19,7 @@ class AnimatedElement(Element):
         self.assets = assets
         self.rotation = 0
         self.flip = False
+        self.fitToSize = True
 
         # animation
         self.action: str = ""
@@ -27,9 +28,48 @@ class AnimatedElement(Element):
 
         self.set_action(self.anim)
 
+    def get_center(self):
+        x = self.transform.x + (self.size[0] // 2)
+        y = self.transform.y + (self.size[1] // 2)
+        return pygame.math.Vector2(x, y)
+
     @property
     def image(self):
-        return pygame.transform.rotate(pygame.transform.flip(self.animation.img(), self.flip, False), self.rotation).convert_alpha()
+        image = self.animation.img()
+        if not self.fitToSize:
+            image = pygame.transform.scale(image, self.size)
+        else:
+            # Get original dimensions
+            original_width, original_height = image.get_size()
+            target_width, target_height = self.size
+
+            # Calculate the scaling factor to maintain aspect ratio
+            width_ratio = target_width / original_width
+            height_ratio = target_height / original_height
+            scaling_factor = min(width_ratio, height_ratio)
+
+            # Calculate the new dimensions
+            new_width = int(original_width * scaling_factor)
+            new_height = int(original_height * scaling_factor)
+
+            # Scale the image to the new dimensions
+            scaled_image = pygame.transform.scale(image, (new_width, new_height))
+
+            # Create a new surface with the target size and transparent background
+            centered_image = pygame.Surface((target_width, target_height), pygame.SRCALPHA)
+
+            # Calculate the top-left position to blit the scaled image
+            top_left_x = (target_width - new_width) // 2
+            top_left_y = (target_height - new_height) // 2
+
+            # Blit the scaled image onto the centered image surface
+            centered_image.blit(scaled_image, (top_left_x, top_left_y))
+
+            image = centered_image
+
+        image = pygame.transform.rotate(pygame.transform.flip(image, self.flip, False), self.rotation).convert_alpha()
+
+        return image
 
     def change_tag(self, tag, action="idle"):
         self.tag = tag
