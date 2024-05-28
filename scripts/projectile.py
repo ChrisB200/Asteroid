@@ -331,5 +331,39 @@ class SpreadWeapon(Weapon):
             self.magazine -= 1
 
     
+class BeamWeapon(Weapon):
+    def __init__(self, maxChargingTime, maxMagazine, reloadTime, isAutomatic, shootTime, bullet, muzzleAreas):
+        super().__init__(maxMagazine, reloadTime, isAutomatic, shootTime, bullet, muzzleAreas)
+        self.maxChargingTime = maxChargingTime
+        self.currentChargingTime = 0
+        self.hasCharged = True
 
-    
+    def copy(self):
+        return self.__class__(self.maxChargingTime, self.maxMagazine, self.reloadTime, self.isAutomatic, self.shootTime, self.bullet, self.muzzleAreas)
+
+    def shoot(self, game, transform):
+        if not self.shooting:
+            self.currentChargingTime = self.maxChargingTime
+            self.hasCharged = False
+            print("hi")
+        super().shoot(game, transform)
+
+    def update_timers(self, dt):
+        if self.currentReloadTime <= 0:
+            if self.canReload == False:
+                self.magazine = self.maxMagazine
+                print("reloaded")
+            self.canReload = True
+            self.isReloading = False
+            self.localRotation = 0
+
+            if self.currentChargingTime < 0 and self.shooting:
+                self.hasCharged = True
+                print("charged")
+            elif self.currentChargingTime > 0 and self.shooting:
+                self.currentChargingTime -= dt
+                print("charging")
+        elif self.currentReloadTime > 0:
+            self.currentReloadTime -= dt
+            print("reloading")
+

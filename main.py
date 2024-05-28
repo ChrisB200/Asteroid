@@ -51,6 +51,7 @@ class Game():
         self.arrows = ModifiedSpriteGroup()
         self.explosions = ModifiedSpriteGroup()
         self.other = ModifiedSpriteGroup()
+        self.items = ModifiedSpriteGroup()
         self.state = "running"
 
         self.bgImage = pygame.image.load("data/bg.png")
@@ -71,6 +72,7 @@ class Game():
         self.SPREADING_PROJECTILE = SpreadProjectile((0, 0), (13, 13), "spread", self.assets, layer=0)
         self.SPREADING_WEAPON = SpreadWeapon(25, 0.7, True, 0.05, self.SPREADING_PROJECTILE, [[-3, 0]])
         
+        self.BEAM_WEAPON = BeamWeapon(1, 50, 1, True, 0.2, self.DEFAULT_PROJECTILE, [[7, 0]])
         self.particles = ParticleSystem((0, 0))
 
         self.ui = UserInterface(self.get_world_size())
@@ -112,7 +114,7 @@ class Game():
         player = Player(numOfPlayers, pos, (26, 17), "spaceship", self.assets, layer)
 
         input = self.inputDevices[input]
-        weapons = [self.DEFAULT_WEAPON.copy(), self.MISSILE_WEAPON.copy(), self.PIERCING_WEAPON.copy(), self.SPREADING_WEAPON.copy()]
+        weapons = [self.DEFAULT_WEAPON.copy(), self.MISSILE_WEAPON.copy(), self.PIERCING_WEAPON.copy(), self.SPREADING_WEAPON.copy(), self.BEAM_WEAPON.copy()]
 
         player.input = input
         player.weapons = weapons
@@ -169,6 +171,10 @@ class Game():
         for asteroid in self.asteroids:
             asteroid.update(self.dt, self)
 
+        for item in self.items:
+            item.update(self.dt)
+            item.check_collisions(self.players)
+
         self.particles.update(self.dt, (0, 0))
         self.waveSystem.update(self.waveNumberText)
         self.ui.update(self.dt)
@@ -185,7 +191,6 @@ class Game():
 
     def run(self):
         self.detect_inputs()
-        print(self.get_world_size())
         self.create_player((200, 20), 0, layer=2)
 
         while self.state == "running":

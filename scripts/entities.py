@@ -78,7 +78,8 @@ class Entity(pygame.sprite.Sprite):
         self.set_action(self.anim)
         
         self.rect: pygame.Rect = pygame.Rect(self.transform.x, self.transform.y, self.size[0], self.size[1])
-    
+        self.entityCollisions = ModifiedSpriteGroup()
+
     @property
     def width(self):
         return self.size[0]
@@ -159,6 +160,21 @@ class Entity(pygame.sprite.Sprite):
         self.update_animation(dt)
         self.rect.x = self.transform.x
         self.rect.y = self.transform.y
+
+    def check_collisions(self, *groups):
+        for group in groups:
+            for sprite in group:
+                if pygame.sprite.collide_mask(self, sprite):
+                    self.handle_collision(sprite)
+                    sprite.handle_collision(self)
+                else:
+                    if self.entityCollisions.has(sprite):
+                        self.entityCollisions.remove(sprite)
+                        sprite.entityCollisions.remove(self)
+
+    def handle_collision(self, other):
+        if not self.entityCollisions.has(other):
+            self.entityCollisions.add(other)
     
 class PhysicsEntity(Entity):
     def __init__(self, transform:tuple[int, int], size:tuple[int, int], tag:str, assets:dict[str, Animation], layer=0, isScroll=True, animation="idle"):
@@ -166,7 +182,7 @@ class PhysicsEntity(Entity):
         super().__init__(transform, size, tag, assets, layer, isScroll, animation)
         # Rects and Collisions
         self.collisions: dict[str, bool] = {'bottom': False, 'top': False, 'left': False, 'right': False}
-        self.entityCollisions = ModifiedSpriteGroup()
+
     # Checks for collisions based on movement direction
     def move(self, movement, tiles, dt):
         # x-axis
@@ -196,21 +212,6 @@ class PhysicsEntity(Entity):
                 objectCollisions["top"] = True
         self.transform.y = int(self.rect.y)
         self.collisions = objectCollisions
-
-    def check_collisions(self, *groups):
-        for group in groups:
-            for sprite in group:
-                if pygame.sprite.collide_mask(self, sprite):
-                    self.handle_collision(sprite)
-                    sprite.handle_collision(self)
-                else:
-                    if self.entityCollisions.has(sprite):
-                        self.entityCollisions.remove(sprite)
-                        sprite.entityCollisions.remove(self)
-
-    def handle_collision(self, other):
-        if not self.entityCollisions.has(other):
-            self.entityCollisions.add(other)
 
 class Player(PhysicsEntity):
     def __init__(self, id:int, transform:tuple[int, int], size:tuple[int, int], tag:str, assets:dict[str, Animation], layer=0, isScroll=True, animation="idle"):
@@ -246,6 +247,7 @@ class Player(PhysicsEntity):
         self.set_action("idle")
         self.loadingSpinnerTemplate = Entity(self.get_center(), (16, 16), "spinner", self.assets, self.camLayer + 1)
         self.spinner = None
+        self.activePowerUps = ModifiedSpriteGroup()
 
     def event_handler(self, event, game):
         if self.input is not None:
@@ -268,7 +270,6 @@ class Player(PhysicsEntity):
                 if self.weapon:
                     if self.weapon.canReload:
                         if self.weapon.magazine < self.weapon.maxMagazine:
-                            print("yes")
                             self.weapon.reload()
                             self.spinner = self.loadingSpinnerTemplate.copy()
                             game.add_to_world(self.spinner)
@@ -324,12 +325,13 @@ class Player(PhysicsEntity):
                 if self.weapon:
                     if self.weapon.canReload:
                         if self.weapon.magazine < self.weapon.maxMagazine:
-                            print("yes")
                             self.weapon.reload()
                             self.spinner = self.loadingSpinnerTemplate.copy()
                             game.add_to_world(self.spinner)
             if event.button == self.input.controls.dash:
                 self.dash()
+            if event.button == self.input.controls.swapWeapon:
+                self.swap_weapon(+1)
 
         if self.input.rightTrigger.down:
             if self.weapon:
@@ -540,6 +542,10 @@ class Player(PhysicsEntity):
         if sprite.tag == "ufo" or sprite.tag == "asteroid":
             if not self.entityCollisions.has(sprite):
                 self.take_damage(sprite.damage)
+        if sprite.tag in ["health", "reload"]:
+            print("hi")
+            self.handle_item(sprite)
+
         super().handle_collision(sprite)
 
     def handle_explosion(self, game):
@@ -638,6 +644,14 @@ class Player(PhysicsEntity):
             self.dashTimer = self.dashDuration
             self.dashDirection = self.calculate_dash_direction()
 
+    def handle_item(self, item):
+        if item.tag == "health":
+            self.health += 20
+        if item.tag == "reload":
+            for weapon in self.weapons:
+                weapon.magazine = weapon.maxMagazine
+        item.kill()
+
     def update(self, tiles, dt, camera: Camera, game):
         self.update_movement(dt)
         self.update_animation(dt)
@@ -653,6 +667,8 @@ class Player(PhysicsEntity):
             self.weapon.update(game, self.get_center())
         if self.spinner:
             self.update_spinner(dt)
+        if self.health <= 0:
+            game.state = "ended"
         
         #camera.draw_rect((255, 0, 0), self.rect)
 class UserCursor(Entity):
@@ -706,6 +722,7 @@ class UFO(PhysicsEntity):
         self.canMove = False
         self.damage = 20
         self.spawned = False
+        self.item = None
 
     def spawn(self, screenSize):
         border = random.randint(1, 2)
@@ -746,7 +763,6 @@ class UFO(PhysicsEntity):
         self.directions[direction] = True
         self.arrow.set_action("enter")
         self.spawned = True
-        print("dom dom yes yes")
 
     def update_timers(self, dt):
         if self.arrow:
@@ -757,7 +773,6 @@ class UFO(PhysicsEntity):
                     self.arrow.kill()
                     self.arrow = None
                     self.canMove = True
-                    print("hi")
                     self.movement.x = (0 if self.canMove == False else 1 if self.directions["right"] else -1 if self.directions["left"] else 0) * self.speed
                     self.movement.y = (0 if self.canMove == False else 1 if self.directions["down"] else -1 if self.directions["up"] else 0) * self.speed
             else:
@@ -799,7 +814,6 @@ class UFO(PhysicsEntity):
         reflectionAngle = random.uniform(0, 2 * math.pi)
         reflectionVector = pygame.math.Vector2(math.cos(reflectionAngle), math.sin(reflectionAngle))
         self.movement = reflectionVector * self.speed
-        print(self.movement)
         
 
     def update(self, dt, camera, game):
@@ -810,7 +824,6 @@ class UFO(PhysicsEntity):
         self.move(self.movement, [], dt)
         self.check_bounds(camera.screenSize)
         self.check_collisions(game.players, game.asteroids)
-        #print(self.movement)
         #camera.draw_rect((255, 0, 0), self.rect)
 
 class Asteroid(PhysicsEntity):
@@ -824,6 +837,7 @@ class Asteroid(PhysicsEntity):
         self.health = 100
         self.spawned = False
         self.direction = pygame.math.Vector2(0, 0)
+        self.item = None
 
     @property
     def image(self):
@@ -839,6 +853,23 @@ class Asteroid(PhysicsEntity):
     def calculate_rotation(self, camera):
         self.rotation = self.get_point_angle(self.targetTransform, camera.scroll)
 
+    def generate_item(self):
+        chance = random.randint(1, 20)
+        match chance:
+            case 1:
+                 self.item = "health"
+            case 2:
+                 self.item = "reload"
+
+    def check_items(self, game):
+        if self.item != None:
+            if self.item == "health":
+                if self.item != None:
+                    item = Entity(self.get_center(), (17, 16), "health", self.assets, 2)
+                    game.items.add(item)
+                    game.add_to_world(item)
+        self.item = None
+
     def spawn(self, size, camera):
         self.set_transform((random.randint(0, size[0]), -60))
         self.targetTransform.x = random.randint(0, size[0])
@@ -850,7 +881,7 @@ class Asteroid(PhysicsEntity):
     def take_damage(self, damage):
         self.health -= damage
         if self.health <= 0:
-            self.kill()
+            self.generate_item()
 
     def handle_collision(self, sprite):
         if sprite.tag == "spaceship":
@@ -915,6 +946,10 @@ class Asteroid(PhysicsEntity):
         self.animation.update(dt)
         self.check_collisions(game.players)
         self.check_bounds(game.window.world.screenSize)
+        self.check_items(game)
+
+        if self.item == None and self.health < 0:
+            self.kill()
 
         if self.action != "idle":
             if self.animation.done:

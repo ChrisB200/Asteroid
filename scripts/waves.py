@@ -99,7 +99,6 @@ class WaveSystem:
             self.waveNumber += 1
             waveNumberText.change_text(str(self.waveNumber))
             self.wave = Wave(self.waveNumber, self.calculate_max_enemies(), self.calculate_max_enemies())
-            print("ended")
             self.wave.start_wave(self.game)
 
     def event_handler(self, event):
