@@ -646,7 +646,7 @@ class Player(PhysicsEntity):
 
     def handle_item(self, item):
         if item.tag == "health":
-            self.health += 20
+            self.health += 50
         if item.tag == "reload":
             for weapon in self.weapons:
                 weapon.magazine = weapon.maxMagazine
@@ -671,44 +671,6 @@ class Player(PhysicsEntity):
             game.state = "ended"
         
         #camera.draw_rect((255, 0, 0), self.rect)
-class UserCursor(Entity):
-    def __init__(self, transform, size, tag, assets, layer=0, isScroll=True):
-        super().__init__(transform, size, tag, assets, layer, isScroll)
-        self.location = pygame.math.Vector2(0, 0)
-
-    def set_transform(self, x, y):
-        self.transform.x = x
-        self.transform.y = y
-
-    def update(self, player:Player, camera:Camera, dt):
-        x = self.transform.x
-        y = self.transform.y
-        if x < 0:
-            x = 0
-        elif x > camera.resolution[0]:
-            x = camera.resolution[0]
-        if y < 0:
-            y = 0
-        elif y > camera.resolution[1]:
-            y = camera.resolution[1]
-        
-        if isinstance(player.input, Controller):
-            x += round(player.input.rightStick[0] * 5)
-            y += round(player.input.rightStick[1] * 5)
-            self.transform.x = x
-            self.transform.y = y
-            self.set_transform(x, y)
-        else:
-            x, y = pygame.mouse.get_pos()
-            self.set_transform(x, y)
-
-        self.cursor_in_space(camera.scale)
-        self.update_animation(dt)
-        
-
-    def cursor_in_space(self, camera_scale):
-        self.location.x = self.transform.x // camera_scale
-        self.location.y = self.transform.y // camera_scale
 
 class UFO(PhysicsEntity):
     def __init__(self, transform, size, tag, assets, layer=1, isScroll=True):
@@ -950,11 +912,8 @@ class Asteroid(PhysicsEntity):
 
         if self.item == None and self.health < 0:
             self.kill()
+            game.score += 25
 
         if self.action != "idle":
             if self.animation.done:
                 self.set_action("idle")
-
-
-
-

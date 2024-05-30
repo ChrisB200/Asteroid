@@ -13,8 +13,6 @@ class Element():
 class AnimatedElement(Element):
     def __init__(self, transform, size, tag, assets, animation="idle"):
         super().__init__(transform, size)
-        self.transform = pygame.math.Vector2(transform)
-        self.size = size
         self.tag = tag
         self.assets = assets
         self.rotation = 0
@@ -98,6 +96,12 @@ class TextElement(Element):
     @property
     def image(self):
         return self.font.render(self.text, False, self.colour)
+    
+    def center_text_x(self, screenSize):
+        self.transform.x = (screenSize[0] // 2) - (self.image.get_width() // 2)
+
+    def center_text_y(self, screenSize):
+        self.transform.y = (screenSize[1] // 2) - (self.image.get_height() // 2)
     
     def change_text(self, text):
         self.text = text

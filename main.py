@@ -57,6 +57,7 @@ class Game():
         self.bgImage = pygame.image.load("data/bg.png")
         self.background = Background((0, 0), self.bgImage, -10)
         self.bgScroll = 1
+        self.score = 0
 
         self.waveSystem = WaveSystem(self)
 
@@ -76,14 +77,17 @@ class Game():
         self.particles = ParticleSystem((0, 0))
 
         self.ui = UserInterface(self.get_world_size())
-        self.heart = AnimatedElement((20, 20), (11, 11), "heart", self.assets)
         self.font = pygame.font.Font("data/fonts/retro-gaming.ttf", 12)
-        self.healthText = TextElement((40, 20), "100", self.font)
-        self.ammoType = AnimatedElement((17.5, 40), (15, 15), "lasarbeam", self.assets)
-        self.ammoType.rotation = -90
+
+        self.heartElements = []
+        self.healthTexts = []
+        self.ammoTypeElements = []
+        self.ammoTexts = []
+
         self.waveNumberText = TextElement((10, self.get_world_size()[1] - 20), "1", self.font)
-        self.ammoText = TextElement((40, 40), f"{self.DEFAULT_WEAPON.magazine} / {self.DEFAULT_WEAPON.maxMagazine}", self.font)
-        self.ui.add(self.heart, self.healthText, self.ammoType, self.ammoText, self.waveNumberText)
+        self.scoreText = TextElement((20, 20), "0", self.font)
+
+        self.ui.add(*self.heartElements, *self.healthTexts, *self.ammoTypeElements, self.waveNumberText, *self.ammoTexts, self.scoreText)
 
         self.window.ui = self.ui
 
@@ -120,8 +124,45 @@ class Game():
         player.weapons = weapons
         player.weapon = player.weapons[0]
 
+        self.create_player_interface()
+
         self.players.add(player)
         self.add_to_world(player)
+
+    def create_player_interface(self):
+        numPlayers = len(self.players)
+        size = self.get_world_size()
+        match numPlayers:
+            case 0:
+                heart = AnimatedElement((20, 20), (11, 11), "heart", self.assets)
+                healthText = TextElement((40, 20), "100", self.font)
+                ammoText = TextElement((40, 40), f"{self.DEFAULT_WEAPON.magazine} / {self.DEFAULT_WEAPON.maxMagazine}", self.font)
+                ammoType = AnimatedElement((17.5, 40), (15, 15), "lasarbeam", self.assets)
+                ammoType.rotation = -90
+            case 1:
+                heart = AnimatedElement((size[0] - 90, 20), (11, 11), "heart", self.assets)
+                healthText = TextElement((size[0] - 70, 20), "100", self.font)
+                ammoText = TextElement((size[0] - 70, 40), f"{self.DEFAULT_WEAPON.magazine} / {self.DEFAULT_WEAPON.maxMagazine}", self.font)
+                ammoType = AnimatedElement((size[0] - 92, 40), (15, 15), "lasarbeam", self.assets)
+                ammoType.rotation = -90
+
+        self.heartElements.append(heart)
+        self.healthTexts.append(healthText)
+        self.ammoTypeElements.append(ammoType)
+        self.ammoTexts.append(ammoText)
+
+        self.ui.add(heart, healthText, ammoText, ammoType)
+
+    def update_player_interface(self):
+        for count, player in enumerate(self.players):
+            self.healthTexts[count].change_text(str(player.health))
+            self.ammoTexts[count].change_text(f"{player.weapon.magazine} / {player.weapon.maxMagazine}")
+            self.ammoTypeElements[count].change_tag(player.weapon.bullet.tag)
+            self.ammoTypeElements[count].rotation = player.weapon.bullet.rotation
+            if player.weapon.magazine == 0:
+                self.ammoTexts[count].change_colour((180, 0, 0))
+            else:
+                self.ammoTexts[count].change_colour((255, 255, 255))
 
     def calculate_deltatime(self):
         self.dt = self.clock.tick() / 1000
@@ -148,16 +189,6 @@ class Game():
         player: Player
         for player in self.players:
             player.update([], self.dt, self.window.world, self)
-
-            weapon = player.weapon
-            self.healthText.change_text(str(player.health))
-            self.ammoText.change_text(f"{weapon.magazine} / {weapon.maxMagazine}")
-            self.ammoType.change_tag(weapon.bullet.tag)
-            self.ammoType.rotation = weapon.bullet.rotation
-            if weapon.magazine == 0:
-                self.ammoText.change_colour((180, 0, 0))
-            else:
-                self.ammoText.change_colour((255, 255, 255))
         
         for projectile in self.projectiles:
             projectile.update(self.dt, self, self.particles)
@@ -174,7 +205,13 @@ class Game():
         for item in self.items:
             item.update(self.dt)
             item.check_collisions(self.players)
+            item.transform.y += self.dt * 30
 
+        self.update_player_interface()
+
+        self.scoreText.change_text(str(self.score))
+        self.scoreText.center_text_x(self.window.world.screenSize)
+        
         self.particles.update(self.dt, (0, 0))
         self.waveSystem.update(self.waveNumberText)
         self.ui.update(self.dt)
@@ -192,6 +229,7 @@ class Game():
     def run(self):
         self.detect_inputs()
         self.create_player((200, 20), 0, layer=2)
+        self.create_player((200, 20), 1, layer=2)
 
         while self.state == "running":
             pygame.mouse.set_visible(False)

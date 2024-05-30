@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 SPAWN_ASTEROID = USEREVENT + 1
 SPAWN_UFO = USEREVENT + 2
 
+# a specific wave
 class Wave:
     def __init__(self, number, numAsteroids, numUFOs):
         self.number = number
