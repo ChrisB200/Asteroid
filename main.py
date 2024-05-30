@@ -43,7 +43,9 @@ class Game():
         self.assets = load_animations(BASE_IMG_PATH)
         self.inputDevices = []
         self.dt = 1
+        self.state = "running"
 
+        # sprite groups
         self.players = ModifiedSpriteGroup()
         self.projectiles = ModifiedSpriteGroup()
         self.ufos = ModifiedSpriteGroup()
@@ -52,15 +54,17 @@ class Game():
         self.explosions = ModifiedSpriteGroup()
         self.other = ModifiedSpriteGroup()
         self.items = ModifiedSpriteGroup()
-        self.state = "running"
 
+        # background
         self.bgImage = pygame.image.load("data/bg.png")
         self.background = Background((0, 0), self.bgImage, -10)
         self.bgScroll = 1
+
+        # waves
+        self.waveSystem = WaveSystem(self)
         self.score = 0
 
-        self.waveSystem = WaveSystem(self)
-
+        # weapons and projectiles
         self.DEFAULT_PROJECTILE = Projectile((0, 0), (13, 13), "lasarbeam", self.assets, layer=0)
         self.DEFAULT_WEAPON = Weapon(50, 1, True, 0.1, self.DEFAULT_PROJECTILE, [[3, -5], [-16, -5]])
 
@@ -76,6 +80,7 @@ class Game():
         self.BEAM_WEAPON = BeamWeapon(1, 50, 1, True, 0.2, self.DEFAULT_PROJECTILE, [[7, 0]])
         self.particles = ParticleSystem((0, 0))
 
+        # user interface elements
         self.ui = UserInterface(self.get_world_size())
         self.font = pygame.font.Font("data/fonts/retro-gaming.ttf", 12)
 
@@ -91,9 +96,11 @@ class Game():
 
         self.window.ui = self.ui
 
+    # adds sprites to world
     def add_to_world(self, *sprites):
         self.window.world.add(*sprites)
 
+    # gets the scaled world size
     def get_world_size(self):
         return self.window.world.screenSize
 
@@ -113,6 +120,7 @@ class Game():
 
         logger.info("Detected %s input devices", len(self.inputDevices))
 
+    # creates a player and assigns them input
     def create_player(self, pos, input=0, layer=0):
         numOfPlayers = len(self.players.sprites())
         player = Player(numOfPlayers, pos, (26, 17), "spaceship", self.assets, layer)
@@ -128,7 +136,8 @@ class Game():
 
         self.players.add(player)
         self.add_to_world(player)
-
+    
+    # creates the user interface for the player.
     def create_player_interface(self):
         numPlayers = len(self.players)
         size = self.get_world_size()
@@ -153,6 +162,7 @@ class Game():
 
         self.ui.add(heart, healthText, ammoText, ammoType)
 
+    # updates the user interface for each player
     def update_player_interface(self):
         for count, player in enumerate(self.players):
             self.healthTexts[count].change_text(str(player.health))
@@ -164,6 +174,7 @@ class Game():
             else:
                 self.ammoTexts[count].change_colour((255, 255, 255))
 
+    # calculate the differnce between frames
     def calculate_deltatime(self):
         self.dt = self.clock.tick() / 1000
 
@@ -177,11 +188,13 @@ class Game():
         self.window.draw()
         pygame.display.flip()
 
+    # background scrolling
     def scroll_background(self):
         self.bgScroll += self.dt * 75
         if self.bgScroll >= self.background.height:
             self.bgScroll = 0
 
+    # game updates
     def update(self):
         self.window.update()
         self.scroll_background()
@@ -216,6 +229,7 @@ class Game():
         self.waveSystem.update(self.waveNumberText)
         self.ui.update(self.dt)
 
+    # handles the event
     def event_handler(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -226,10 +240,11 @@ class Game():
             
             self.waveSystem.event_handler(event)
 
+    # runs the game
     def run(self):
         self.detect_inputs()
         self.create_player((200, 20), 0, layer=2)
-        self.create_player((200, 20), 1, layer=2)
+        #self.create_player((200, 20), 1, layer=2)
 
         while self.state == "running":
             pygame.mouse.set_visible(False)

@@ -93,27 +93,34 @@ class Camera(pygame.sprite.Group):
     def screenSize(self):
         return self.screen.get_size()[0], self.screen.get_size()[1]
     
+    # checks whether the sprites on screen should be affected by camera scroll
     def calculate_scroll(self, sprite):
         if sprite.isScroll:
             self.screen.blit(sprite.image, (sprite.transform.x - self.scroll.x, sprite.transform.y - self.scroll.y))
         else:
             self.screen.blit(sprite.image, (sprite.transform.x, sprite.transform.y))
 
+    # adds a line to the queue
     def draw_line(self, colour, start, end, width=1, layer=1):
         self.queue.append(("line", colour, start, end, width, layer))
 
+    # adds a circle to the queue
     def draw_circle(self, colour, transform, radius, width=0, layer=1):
         self.queue.append(("circle", colour, transform, radius, width, layer))
 
+    # adds a rect to the queue
     def draw_rect(self, colour, rect, layer=1):
         self.queue.append(("rect", colour, rect, layer))
 
+    # adds a surface to the queue
     def draw_surface(self, surf, transform, flags, layer=1):
         self.queue.append(("surface", surf, transform, flags, layer))
 
+    # adds a scrolling background to the queue
     def draw_scrolling_background(self, bg, bgScroll):
         self.queue.append(("background", bg, bgScroll, bg.camLayer))
 
+    # draws a scrolling background
     def scrolling_background(self, bg, bgScroll):
         self.screen.blit(bg.image, (bg.transform.x - self.scroll.x, bgScroll - self.scroll.y))
         self.screen.blit(bg.image, (bg.transform.x - self.scroll.x, -bg.height + bgScroll - self.scroll.y))
@@ -127,12 +134,14 @@ class Camera(pygame.sprite.Group):
         else:
             self.screen.fill((0, 0, 0, 0))  # fill with transparency by default
 
+    # sorts the sprites based on camera layer or last element of tuple
     def sort_sprites(self, sprite):
         if isinstance(sprite, tuple):
             return sprite[-1]
         else:
             return sprite.camLayer
 
+    # draws all the elements in the queue sorted by its layer
     def draw_queue(self):
         sorted_queue = sorted(self.queue, key=lambda item: self.sort_sprites(item))
         

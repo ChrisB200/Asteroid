@@ -1,5 +1,5 @@
 venv
 __pycache__
-/data/game.log
+/game.log
 dist
 build
