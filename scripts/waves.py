@@ -64,10 +64,12 @@ class Wave:
                 stop = True
 
     def event_handler(self, event, game):
-        if event.type == SPAWN_ASTEROID:
-            self.spawn_asteroid(game)
-        if event.type == SPAWN_UFO:
-            self.spawn_ufo(game)
+        if game.state == "running":
+            if event.type == SPAWN_ASTEROID:
+                self.spawn_asteroid(game)
+                pygame.event.post(pygame.event.Event(game.ASTEROID_SPAWN))
+            if event.type == SPAWN_UFO:
+                self.spawn_ufo(game)
 
     def update(self):
         asteroidsLeft = False

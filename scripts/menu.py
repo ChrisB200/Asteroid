@@ -4,11 +4,61 @@ from pygame.constants import *
 class Element():
     def __init__(self, transform, size):
         self.transform = pygame.math.Vector2(transform)
+        self.localTransform = self.transform.copy()
         self.size = size
         self.layer = 1
+        self.active = False
+        self.hasPressed = False
+        self.visible = True
 
-    def update(dt):
+    def set_visible(self, state):
+        self.visible = state
+
+    def set_active(self, state):
+        self.active = state
+
+    def set_transform(self, x=None, y=None):
+        if self.transform != self.localTransform:
+            if x:
+                self.localTransform.x = x
+            if y:
+                self.localTransform.y = y
+        else:
+            if x:
+                self.localTransform.x = x
+            if y:
+                self.localTransform.y = y
+            self.transform = self.localTransform.copy()
+
+    def dock(self, size, x, y):
+        if x:
+            self.set_transform(size[0] // 2 - (self.size[0] // 2))
+        if y:
+            self.set_transform(size[1] // 2 - (self.size[1] // 2))
+
+    def update(self, dt):
         pass
+
+class SurfaceElement(Element):
+    def __init__(self, transform, size, surface):
+        super().__init__(transform, size)
+        self.surface = surface
+
+    @property
+    def image(self):
+        return self.surface
+
+class RectElement(Element):
+    def __init__(self, transform, size, colour):
+        super().__init__(transform, size)
+        self.colour = colour
+        self.rect = pygame.Rect(self.transform.x, self.transform.y, size[0], size[1])
+        self.surface = pygame.Surface(size, pygame.SRCALPHA)
+
+    @property
+    def image(self):
+        pygame.draw.rect(self.surface, self.colour, self.rect)
+        return self.surface
 
 class AnimatedElement(Element):
     def __init__(self, transform, size, tag, assets, animation="idle"):
@@ -95,7 +145,10 @@ class TextElement(Element):
 
     @property
     def image(self):
-        return self.font.render(self.text, False, self.colour)
+         font = self.font.render(self.text, False, self.colour)
+         font.convert_alpha()
+         self.size = (font.get_width(), font.get_height())
+         return font
     
     def center_text_x(self, screenSize):
         self.transform.x = (screenSize[0] // 2) - (self.image.get_width() // 2)
@@ -115,26 +168,82 @@ class TextElement(Element):
     def update(self, dt):
         self.size = self.image.get_width(), self.image.get_height()
 
+class Group(Element):
+    def __init__(self, transform, size, *elements):
+        super().__init__(transform, size)
+        self.add(*elements)
+        self.elements = []
+
+    @property
+    def image(self):
+        return pygame.Surface((0, 0))
+
+    def add(self, *elements):
+        for element in elements:
+            self.elements.append(element)
+
+    def set_visbile(self, state):
+        for element in self.elements:
+            element.set_visible(state)
+
+    def set_active(self, state):
+        for element in self.elements:
+            element.set_active(state)
+
+    def center_element_x(self, element):
+        x = self.transform.x + ((element.size[0] // 2) - (self.size[0] // 2))
+        element.set_transform(x, None)
+
+    def center_element_y(self, element):
+        y = self.transform.y + (self.size[1] // 2 - (element.size[1] // 2))
+        element.set_transform(None, y)
+        
+    def update(self, dt):
+        for element in self.elements:
+            element.update(dt)
+            element.transform = self.transform + element.localTransform
+
 class UserInterface():
     def __init__(self, size):
         self.transform = pygame.math.Vector2()
         self.size = size
         self.elements = []
         self.surface = pygame.Surface(self.size, pygame.SRCALPHA | pygame.HWSURFACE)
+        self.hoveredElements = []
 
     def add(self, *elements):
         for element in elements:
             self.elements.append(element)
 
+    def add_group(self, *groups):
+        for group in groups:
+            self.add(group, *group.elements)
+
     def remove(self, *elements):
         for element in elements:
             self.elements.remove(element)
 
-    def update(self, dt):
+    def update(self, dt, camera):
+        if self.hoveredElements == []:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+        mx, my = pygame.mouse.get_pos()[0] // camera.scale, pygame.mouse.get_pos()[1] // camera.scale
         for element in self.elements:
             element.update(dt)
+            
+            if element.active:
+                if mx > element.transform.x and mx < element.transform.x + element.size[0]:
+                    if my < element.transform.y + element.size[1] and my > element.transform.y:
+                        pygame.mouse.set_visible(True)
+                        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                    
+                        if element not in self.hoveredElements:
+                            self.hoveredElements.append(element)
+                    else:
+                        if element in self.hoveredElements:
+                            self.hoveredElements.remove(element)
 
     def draw(self):
         self.surface.fill((0, 0, 0, 0))
         for element in sorted(self.elements, key=lambda element: element.layer):
-            self.surface.blit(element.image, (element.transform.x, element.transform.y))
+            if element.visible:
+                self.surface.blit(element.image, (element.transform.x, element.transform.y))

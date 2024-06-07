@@ -14,7 +14,7 @@ from scripts.constants import BASE_IMG_PATH
 from scripts.projectile import *
 from scripts.particles import Particle, ParticleSystem
 from scripts.waves import WaveSystem
-from scripts.menu import UserInterface, AnimatedElement, TextElement
+from scripts.menu import RectElement, UserInterface, AnimatedElement, TextElement, SurfaceElement, Group
 
 # configure the logger
 logging.basicConfig(
@@ -60,6 +60,10 @@ class Game():
         self.background = Background((0, 0), self.bgImage, -10)
         self.bgScroll = 1
 
+        self.asteroidsDestroyed = 0
+        self.asteroidsMissed = 0
+        self.totalAsteroidsStats = 0
+
         # waves
         self.waveSystem = WaveSystem(self)
         self.score = 0
@@ -91,9 +95,35 @@ class Game():
 
         self.waveNumberText = TextElement((10, self.get_world_size()[1] - 20), "1", self.font)
         self.scoreText = TextElement((20, 20), "0", self.font)
-
+        self.fpsText = TextElement((200, 200), "0", self.font)
+        
         self.ui.add(*self.heartElements, *self.healthTexts, *self.ammoTypeElements, self.waveNumberText, *self.ammoTexts, self.scoreText)
+        
+        self.smallerFont = pygame.font.Font("data/fonts/retro-gaming.ttf", 10)
+        self.deathBackground = RectElement((0, 0), (200, 200), (0, 0, 0, 150))
 
+        self.totalAsteroids = TextElement((20, 30), "0", self.smallerFont)
+        self.totalAsteroidsLabel = TextElement((20, 10), "Total Asteroids", self.smallerFont)
+
+        self.asteroidStats = TextElement((20, 70), "0", self.smallerFont)
+        self.asteroidsStatsLabel = TextElement((20, 50), "Destroyed Asteroids", self.smallerFont)
+        
+        self.missedAsteroids = TextElement((20, 110), "0", self.smallerFont)
+        self.missedAsteroidsLabel = TextElement((20, 90), "Missed Asteroids", self.smallerFont)        
+
+        self.scoreLabel = TextElement((20, 130), "Score", self.smallerFont)
+        self.scoreStats = TextElement((20, 150), "0", self.smallerFont)
+        
+        self.retryButtonText = TextElement((80, 170), "Retry", self.smallerFont)  
+
+        self.deathGroup = Group((100, 100), (200, 200))
+        self.deathGroup.add(self.deathBackground, self.retryButtonText, self.asteroidsStatsLabel, self.missedAsteroids, self.missedAsteroidsLabel, self.asteroidStats, self.scoreLabel, self.scoreStats, self.totalAsteroids, self.totalAsteroidsLabel)
+        
+        self.deathGroup.center_element_x(self.asteroidsStatsLabel)
+        self.deathGroup.set_visible(False)
+        self.ui.add_group(self.deathGroup)
+        
+        self.dead = False
         self.window.ui = self.ui
 
     # adds sprites to world
@@ -126,7 +156,7 @@ class Game():
         player = Player(numOfPlayers, pos, (26, 17), "spaceship", self.assets, layer)
 
         input = self.inputDevices[input]
-        weapons = [self.DEFAULT_WEAPON.copy(), self.MISSILE_WEAPON.copy(), self.PIERCING_WEAPON.copy(), self.SPREADING_WEAPON.copy(), self.BEAM_WEAPON.copy()]
+        weapons = [self.DEFAULT_WEAPON.copy(), self.MISSILE_WEAPON.copy(), self.PIERCING_WEAPON.copy(), self.SPREADING_WEAPON.copy()]
 
         player.input = input
         player.weapons = weapons
@@ -199,10 +229,16 @@ class Game():
         self.window.update()
         self.scroll_background()
 
+        self.totalAsteroids.change_text(str(self.totalAsteroidsStats))
+        self.asteroidStats.change_text(str(self.asteroidsDestroyed))
+        self.missedAsteroids.change_text(str(self.asteroidsMissed))
+        self.scoreStats.change_text(str(self.score))
+
         player: Player
         for player in self.players:
             player.update([], self.dt, self.window.world, self)
-        
+            if player.health <= 0: self.state = "dead"
+
         for projectile in self.projectiles:
             projectile.update(self.dt, self, self.particles)
 
@@ -221,38 +257,145 @@ class Game():
             item.transform.y += self.dt * 30
 
         self.update_player_interface()
+        self.deathGroup.dock(self.get_world_size(), True, False)
 
         self.scoreText.change_text(str(self.score))
+        self.fpsText.change_text(str(self.clock.get_fps()))
         self.scoreText.center_text_x(self.window.world.screenSize)
         
         self.particles.update(self.dt, (0, 0))
-        self.waveSystem.update(self.waveNumberText)
-        self.ui.update(self.dt)
+        
+        if self.state == "running":
+            self.waveSystem.update(self.waveNumberText)
+        if self.state == "dead":
+            for sprite in self.asteroids:
+                sprite.kill()
+            for sprite in self.ufos:
+                sprite.kill()
+        self.ui.update(self.dt, self.window.world)
 
     # handles the event
     def event_handler(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.state = "" 
-        
+                self.state = ""
+            if event.type == self.ASTEROID_SPAWN:
+                self.totalAsteroidsStats += 1
+            if event.type == self.ASTEROID_MISSED:
+                self.asteroidsMissed += 1
+            if event.type == self.ASTEROID_DESTROYED:
+                self.asteroidsDestroyed += 1
+
             for player in self.players:
                 player.event_handler(event, self)
-            
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                print("MouseDown")
+                if event.button == 1 and self.state == "dead":
+                    print("pressed")
+                    if self.retryButtonText in self.ui.hoveredElements:
+                        print("dead")
+                        self.start_game()
+
             self.waveSystem.event_handler(event)
+
+    def death_screen(self):
+        if not self.dead:
+            self.ui.add_group(self.deathGroup)
+            self.dead = True
+
+        pygame.mouse.set_visible(True)
+        self.deathGroup.set_visible(True)
+        self.retryButtonText.set_active(True)
+
+    def start_game(self):
+        self.players.empty()
+        self.projectiles.empty()
+        self.ufos.empty()
+        self.asteroids.empty()
+        self.arrows.empty()
+        self.explosions.empty()
+        self.other.empty()
+        self.items.empty()
+        self.ui.elements = []
+        self.window.world.empty()
+
+        self.waveSystem = WaveSystem(self)
+        self.score = 0
+        self.state = "running"
+
+        self.deathGroup.set_visible(False)
+        self.deathGroup.set_active(False)
+
+        self.ASTEROID_SPAWN = USEREVENT + 4
+        self.ASTEROID_MISSED = USEREVENT + 5
+        self.ASTEROID_DESTROYED = USEREVENT + 6
+
+        # user interface elements
+
+        self.heartElements = []
+        self.healthTexts = []
+        self.ammoTypeElements = []
+        self.ammoTexts = []
+
+        self.asteroidsDestroyed = 0
+        self.asteroidsMissed = 0
+        self.totalAsteroidsStats = 0
+
+        self.waveNumberText = TextElement((10, self.get_world_size()[1] - 20), "1", self.font)
+        self.scoreText = TextElement((20, 20), "0", self.font)
+        self.fpsText = TextElement((200, 200), "0", self.font)
+        
+        self.ui.add(*self.heartElements, *self.healthTexts, *self.ammoTypeElements, self.waveNumberText, *self.ammoTexts, self.scoreText)
+        
+        self.smallerFont = pygame.font.Font("data/fonts/retro-gaming.ttf", 10)
+        self.deathBackground = RectElement((0, 0), (200, 200), (0, 0, 0, 150))
+
+        self.totalAsteroids = TextElement((20, 30), "0", self.smallerFont)
+        self.totalAsteroidsLabel = TextElement((20, 10), "Total Asteroids", self.smallerFont)
+
+        self.asteroidStats = TextElement((20, 70), "0", self.smallerFont)
+        self.asteroidsStatsLabel = TextElement((20, 50), "Destroyed Asteroids", self.smallerFont)
+        
+        self.missedAsteroids = TextElement((20, 110), "0", self.smallerFont)
+        self.missedAsteroidsLabel = TextElement((20, 90), "Missed Asteroids", self.smallerFont)        
+
+        self.scoreLabel = TextElement((20, 130), "Score", self.smallerFont)
+        self.scoreStats = TextElement((20, 150), "0", self.smallerFont)
+        
+        self.retryButtonText = TextElement((80, 170), "Retry", self.smallerFont)  
+
+        self.deathGroup = Group((100, 100), (200, 200))
+        self.deathGroup.add(self.deathBackground, self.retryButtonText, self.asteroidsStatsLabel, self.missedAsteroids, self.missedAsteroidsLabel, self.asteroidStats, self.scoreLabel, self.scoreStats, self.totalAsteroids, self.totalAsteroidsLabel)
+        
+        self.deathGroup.center_element_x(self.asteroidsStatsLabel)
+        self.deathGroup.set_visible(False)
+        self.dead = False
+
+        self.create_player((200, 20), 0, layer=2)
 
     # runs the game
     def run(self):
         self.detect_inputs()
-        self.create_player((200, 20), 0, layer=2)
-        #self.create_player((200, 20), 1, layer=2)
-
-        while self.state == "running":
-            pygame.mouse.set_visible(False)
-            self.calculate_deltatime()
-            self.event_handler()
-            self.update()
-            self.draw()
-            #print(int(self.clock.get_fps()))
+        self.start_game()
+        #self.create_player((300, 20), 0, layer=2)
+        
+        while True:
+            if self.state == "running":
+                pygame.mouse.set_visible(False)
+                self.calculate_deltatime()
+                self.event_handler()
+                self.update()
+                self.draw()
+                #print(int(self.clock.get_fps()))
+            if self.state == "dead":
+                self.update()
+                self.calculate_deltatime()
+                self.death_screen()
+                self.draw()
+                self.event_handler()
+            if self.state == "":
+                break
             
 if __name__ == "__main__":
     game = Game()

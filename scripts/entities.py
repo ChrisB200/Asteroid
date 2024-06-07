@@ -353,6 +353,13 @@ class Player(PhysicsEntity):
         if self.dashCooldownTimer > 0:
             self.dashCooldownTimer -= dt
 
+    def remove_player(self):
+        if self.explosion == None:
+            self.kill()
+        else:
+            if self.explosion.animation.done:
+                self.kill()
+
     def update_spinner(self, dt):
         self.spinner.update_animation(dt)
         self.spinner.transform = self.transform.copy()
@@ -667,8 +674,10 @@ class Player(PhysicsEntity):
             self.weapon.update(game, self.get_center())
         if self.spinner:
             self.update_spinner(dt)
-        if self.health <= 0:
-            game.state = "ended"
+        if self.health <= 0 or game.state == "dead":
+            game.state = "dead"
+            self.remove_player()
+            self.health = 0
         
         #camera.draw_rect((255, 0, 0), self.rect)
 
@@ -800,6 +809,7 @@ class Asteroid(PhysicsEntity):
         self.spawned = False
         self.direction = pygame.math.Vector2(0, 0)
         self.item = None
+        self.game = None
 
     @property
     def image(self):
@@ -848,6 +858,7 @@ class Asteroid(PhysicsEntity):
     def handle_collision(self, sprite):
         if sprite.tag == "spaceship":
             self.kill()
+            pygame.event.post(pygame.event.Event((self.game.ASTEROID_MISSED)))
         if sprite.tag in ["lasarbeam", "piercing", "spread"]:
             if not self.entityCollisions.has(sprite):
                 self.take_damage(sprite.damage)
@@ -896,12 +907,16 @@ class Asteroid(PhysicsEntity):
     def check_bounds(self, screenSize):
         if self.transform.x < -100:
             self.kill()
+            pygame.event.post(pygame.event.Event(self.game.ASTEROID_MISSED))
         if self.transform.x > screenSize[0] + 100:
             self.kill()
+            pygame.event.post(pygame.event.Event(self.game.ASTEROID_MISSED))
         if self.transform.y < -400:
             self.kill()
+            pygame.event.post(pygame.event.Event(self.game.ASTEROID_MISSED))
         if self.transform.y > screenSize[1]:
             self.kill()
+            pygame.event.post(pygame.event.Event(self.game.ASTEROID_MISSED))
         
     def update(self, dt, game):    
         self.move(self.direction, [], dt)
@@ -909,10 +924,12 @@ class Asteroid(PhysicsEntity):
         self.check_collisions(game.players)
         self.check_bounds(game.window.world.screenSize)
         self.check_items(game)
+        self.game = game
 
         if self.item == None and self.health < 0:
             self.kill()
             game.score += 25
+            pygame.event.post(pygame.event.Event(game.ASTEROID_DESTROYED))
 
         if self.action != "idle":
             if self.animation.done:
